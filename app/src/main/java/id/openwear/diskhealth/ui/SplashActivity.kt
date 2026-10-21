@@ -320,11 +320,16 @@ object DialogFactory {
         val dialog = android.app.Dialog(activity)
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
         dialog.setContentView(view)
+        Ui.styleDialog(view)
         val window = dialog.window
         window?.setBackgroundDrawableResource(android.R.color.transparent)
         window?.setDimAmount(0.3f)
         val metrics = activity.resources.displayMetrics
-        window?.setLayout((metrics.widthPixels * 0.9).toInt(), android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
+        val width = kotlin.math.min(
+            (metrics.widthPixels * 0.9f).toInt(),
+            (420 * metrics.density).toInt()
+        )
+        window?.setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT)
         return dialog
     }
 }

@@ -29,7 +29,8 @@ v5.0.0 adds:
 * **Wear Level A / B / Pre-EOL** - pSLC and TLC/MLC wear plus JEDEC
   `PRE_EOL_INFO` and spare-block status.
 * **Appearance** - MD3 Expressive or Liquid Glass, with Flat Color or Animated
-  Orbs backgrounds.
+  Orbs backgrounds. Liquid Glass uses the v5 aurora mesh, translucent cards,
+  1dp rims, and 32dp dialogs.
 * **Compact widgets** - dashboard and wear widgets switch to compact layouts
   when the launcher gives them a small width.
 * **Update check** - checks the latest OpenWear GitHub release.
@@ -85,8 +86,8 @@ Built and signed locally. This file has not been uploaded to GitHub.
 | File | `dist/OpenWear-5.0.0-release.apk` |
 | Package | `id.openwear.diskhealth` |
 | Version | 5.0.0 (versionCode 5) |
-| Size | 14,326,258 bytes |
-| SHA-256 | `2995856B8044E6C8C362451AC82BEE877FB805A91D75B1E775018918F4D2C2C5` |
+| Size | 14,338,603 bytes |
+| SHA-256 | `62568BC13122A6A31D57FF03977C1CD5BF732A28ADD6787A9BC7F0C68566DE2D` |
 | Signature | APK Signature Scheme v3 |
 | Certificate SHA-256 | `8fd9d94f32760fc5df0891b8b59a9dfa2e2a708c7de081e0cf1a44dd9b8b2dcc` |
 | Certificate DN | `CN=OpenWear, OU=OpenWear, O=OpenWear, L=Unknown, ST=Unknown, C=ID` |

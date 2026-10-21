@@ -392,8 +392,8 @@
     "assembleDebug": "BUILD SUCCESSFUL",
     "assembleRelease": "BUILD SUCCESSFUL",
     "apk": "OpenWear-5.0.0-release.apk (local dist folder, not published)",
-    "apk_sha256": "2995856B8044E6C8C362451AC82BEE877FB805A91D75B1E775018918F4D2C2C5",
-    "apk_size_bytes": 14326258,
+    "apk_sha256": "62568BC13122A6A31D57FF03977C1CD5BF732A28ADD6787A9BC7F0C68566DE2D",
+    "apk_size_bytes": 14338603,
     "apk_signature": {
       "scheme": "v3",
       "signer_cn": "OpenWear",

@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import id.openwear.diskhealth.BuildConfig
@@ -53,6 +54,11 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Ui.applyAppearance(this)
+    }
+
     override fun onDestroy() {
         Ui.stopAppearance(this)
         super.onDestroy()
@@ -70,6 +76,18 @@ class SettingsActivity : AppCompatActivity() {
             super.onViewCreated(view, savedInstanceState)
             view.setBackgroundColor(android.graphics.Color.TRANSPARENT)
             listView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            listView.addOnChildAttachStateChangeListener(
+                object : RecyclerView.OnChildAttachStateChangeListener {
+                    override fun onChildViewAttachedToWindow(child: View) {
+                        Ui.styleView(child)
+                    }
+
+                    override fun onChildViewDetachedFromWindow(child: View) = Unit
+                }
+            )
+            view.post {
+                if (isAdded) Ui.applyAppearance(requireActivity())
+            }
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -157,7 +175,7 @@ class SettingsActivity : AppCompatActivity() {
             list.choiceMode = ListView.CHOICE_MODE_SINGLE
             list.adapter = ArrayAdapter(
                 requireContext(),
-                android.R.layout.simple_list_item_single_choice,
+                R.layout.item_list_choice,
                 modes
             )
             list.setItemChecked(checked, true)

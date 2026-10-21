@@ -85,6 +85,7 @@
     <dimen name="appcompat_dialog_background_inset">16.0dp</dimen>
     <dimen name="cardCornerRadius">24.0dp</dimen>
     <dimen name="cardElevation">6.0dp</dimen>
+    <dimen name="dialogCornerRadius">32.0dp</dimen>
     <dimen name="cardview_compat_inset_shadow">1.0dp</dimen>
     <dimen name="cardview_default_elevation">2.0dp</dimen>
     <dimen name="cardview_default_radius">2.0dp</dimen>
@@ -572,6 +573,7 @@
     <dimen name="notification_top_pad_large_text">5.0dp</dimen>
     <dimen name="parentMargin">8.0dp</dimen>
     <dimen name="preference_dropdown_padding_start">72.0dp</dimen>
+    <dimen name="settingsMargin">16.0dp</dimen>
     <dimen name="preference_icon_minWidth">0.0dp</dimen>
     <dimen name="preference_seekbar_padding_horizontal">0.0dp</dimen>
     <dimen name="preference_seekbar_padding_vertical">15.0dp</dimen>
