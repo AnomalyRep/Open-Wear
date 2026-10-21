@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="240dp"
+    android:viewportWidth="120"
+    android:viewportHeight="240"
+    android:tint="?attr/colorOnSurfaceVariant">
+
+    <!-- phone body -->
+    <path
+        android:pathData="M28,22 a12,12 0 0 1 12,-12 h40 a12,12 0 0 1 12,12 v196 a12,12 0 0 1 -12,12 h-40 a12,12 0 0 1 -12,-12 z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="3"
+        android:fillColor="@android:color/transparent" />
+
+    <!-- earpiece -->
+    <path
+        android:pathData="M52,18 h16"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="3"
+        android:strokeLineCap="round" />
+
+    <!-- home indicator -->
+    <path
+        android:pathData="M60,216 m-4,0 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0"
+        android:fillColor="#FF000000" />
+
+    <!-- disk glyph on screen -->
+    <path
+        android:pathData="M60,86 m-18,0 a18,18 0 1 0 36,0 a18,18 0 1 0 -36,0 M60,86 m-4,0 a4,4 0 1 0 8,0 a4,4 0 1 0 -8,0"
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd" />
+</vector>

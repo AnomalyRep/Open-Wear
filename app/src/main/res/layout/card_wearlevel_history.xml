@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView android:padding="@dimen/parentMargin" android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/parentMargin" android:foreground="?android:selectableItemBackground" android:elevation="@dimen/cardElevation" android:stateListAnimator="@anim/state_list_anim" android:layout_marginHorizontal="@dimen/parentMargin" app:cardBackgroundColor="?colorSurface" app:cardCornerRadius="@dimen/cardCornerRadius" app:cardMaxElevation="2.0dp" style="@style/Widget.Material3.CardView.Filled"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout android:padding="@dimen/parentMargin" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="@dimen/parentMargin">
+        <TextView android:textAppearance="@style/TextAppearanceTitle" android:id="@id/tv_chart_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="8.0dp" android:text="@string/wear_level_history" android:drawablePadding="4.0dp" android:layout_alignParentTop="true" android:drawableStart="@drawable/ic_chart" android:layout_alignParentStart="true" />
+        <ImageButton android:id="@id/btn_reports" android:background="?selectableItemBackgroundBorderless" android:layout_width="24.0dp" android:layout_height="24.0dp" android:src="@drawable/ic_report" android:scaleType="centerInside" android:layout_alignParentTop="true" android:layout_alignParentEnd="true" app:tint="?colorError" />
+        <id.openwear.diskhealth.ui.view.HistoryChartView android:id="@id/lineChart" android:layout_width="match_parent" android:layout_height="200.0dp" android:layout_below="@id/tv_chart_title" />
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
+

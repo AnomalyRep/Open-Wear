@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="vertical" android:id="@id/rl_b" android:padding="4.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" android:animateLayoutChanges="true"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:animateLayoutChanges="true">
+        <FrameLayout android:id="@id/fl_1b" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="4.0dp" android:animateLayoutChanges="true">
+            <com.google.android.material.progressindicator.CircularProgressIndicator android:layout_gravity="center" android:id="@id/wear_level_progress_1b" android:padding="@dimen/parentMargin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:indeterminate="false" app:indicatorColor="?colorPrimary" app:indicatorInset="4.0dp" app:indicatorSize="70.0dp" app:trackColor="@color/colorPrimaryInverse" app:trackCornerRadius="@dimen/cardCornerRadius" app:trackThickness="8.0dp" style="@style/Widget.MaterialComponents.CircularProgressIndicator.Medium" />
+            <LinearLayout android:gravity="center" android:layout_gravity="center" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <TextView android:textAppearance="@style/TextAppearanceBody" android:textSize="12.0sp" android:textStyle="bold" android:id="@id/tv_hex_1_b" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textAppearance="@style/TextAppearanceBody" android:textSize="10.0sp" android:id="@id/tv_wear_level_percent_1b" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </FrameLayout>
+        <FrameLayout android:id="@id/fl_2b" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="4.0dp" android:animateLayoutChanges="true">
+            <com.google.android.material.progressindicator.CircularProgressIndicator android:layout_gravity="center" android:id="@id/wear_level_progress_2b" android:padding="@dimen/parentMargin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:indeterminate="false" app:indicatorColor="?colorPrimary" app:indicatorInset="4.0dp" app:indicatorSize="70.0dp" app:trackColor="@color/colorPrimaryInverse" app:trackCornerRadius="@dimen/cardCornerRadius" app:trackThickness="8.0dp" style="@style/Widget.MaterialComponents.CircularProgressIndicator.Medium" />
+            <LinearLayout android:gravity="center" android:layout_gravity="center" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <TextView android:textAppearance="@style/TextAppearanceBody" android:textSize="12.0sp" android:textStyle="bold" android:id="@id/tv_hex_2_b" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textAppearance="@style/TextAppearanceBody" android:textSize="10.0sp" android:id="@id/tv_wear_level_percent_2b" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+    <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8.0dp">
+        <TextView android:textAppearance="@style/TextAppearanceBody" android:textSize="11.0sp" android:ellipsize="marquee" android:id="@id/tv_node_b" android:focusable="true" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:scrollHorizontally="true" android:singleLine="true" android:marqueeRepeatLimit="marquee_forever" />
+        <TextView android:textAppearance="@style/TextAppearanceBody" android:textStyle="bold" android:ellipsize="marquee" android:id="@id/tv_wear_level_title_b" android:focusable="true" android:focusableInTouchMode="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:scrollHorizontally="true" android:singleLine="true" android:marqueeRepeatLimit="marquee_forever" />
+    </LinearLayout>
+</LinearLayout>

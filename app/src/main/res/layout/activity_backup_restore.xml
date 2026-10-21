@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="?colorSurfaceVariant" android:fitsSystemWindows="false" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <include android:id="@id/toolbarlayout" layout="@layout/toolbar" />
+    <com.google.android.material.button.MaterialButtonToggleGroup android:gravity="center" android:id="@id/toggle_group" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12.0dp" android:layout_marginHorizontal="16.0dp" app:checkedButton="@id/btn_mode_backup" app:selectionRequired="true" app:singleSelection="true">
+        <com.google.android.material.button.MaterialButton android:textColor="@color/selector_toggle_text" android:id="@id/btn_mode_backup" android:layout_width="0.0dp" android:layout_height="wrap_content" android:text="@string/backup" android:layout_weight="1.0" app:backgroundTint="@color/selector_toggle_bg" style="@style/Widget.Material3.Button.OutlinedButton" />
+        <com.google.android.material.button.MaterialButton android:textColor="@color/selector_toggle_text" android:id="@id/btn_mode_restore" android:layout_width="0.0dp" android:layout_height="wrap_content" android:text="@string/restore" android:layout_weight="1.0" app:backgroundTint="@color/selector_toggle_bg" style="@style/Widget.Material3.Button.OutlinedButton" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+    <LinearLayout android:orientation="vertical" android:id="@id/layout_backup" android:visibility="visible" android:layout_width="match_parent" android:layout_height="match_parent">
+        <com.google.android.material.card.MaterialCardView android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8.0dp" android:foreground="?android:selectableItemBackground" android:layout_weight="1.0" android:elevation="@dimen/cardElevation" android:stateListAnimator="@anim/state_list_anim" android:layout_marginHorizontal="@dimen/parentMargin" app:cardBackgroundColor="?colorSurface" app:cardCornerRadius="@dimen/cardCornerRadius" style="@style/Widget.Material3.CardView.Filled">
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+                <TextView android:textAppearance="@style/TextAppearanceTitle" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_partitions_to_backup" android:paddingVertical="8.0dp" />
+                <androidx.recyclerview.widget.RecyclerView android:id="@id/rv_partitions" android:fadingEdgeLength="96.0dp" android:layout_width="match_parent" android:layout_height="match_parent" android:requiresFadingEdge="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="32.0dp" android:foreground="?android:selectableItemBackground" android:elevation="@dimen/cardElevation" android:stateListAnimator="@anim/state_list_anim" android:layout_marginHorizontal="@dimen/parentMargin" app:cardBackgroundColor="?colorSurface" app:cardCornerRadius="@dimen/cardCornerRadius" style="@style/Widget.Material3.CardView.Filled">
+            <LinearLayout android:orientation="vertical" android:padding="16.0dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.google.android.material.materialswitch.MaterialSwitch android:textColor="@color/red" android:id="@id/switch_advanced_partitions" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/show_all_partitions_available" />
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <com.google.android.material.checkbox.MaterialCheckBox android:id="@id/cb_select_all_backup" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/select_all" android:layout_marginEnd="16.0dp" />
+                    <View android:layout_width="0.0dp" android:layout_height="0.0dp" android:layout_weight="1.0" />
+                    <com.google.android.material.button.MaterialButton android:id="@id/btn_start_backup" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/start_backup" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:id="@id/layout_restore" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
+        <com.google.android.material.card.MaterialCardView android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8.0dp" android:foreground="?android:selectableItemBackground" android:layout_weight="1.0" android:elevation="@dimen/cardElevation" android:stateListAnimator="@anim/state_list_anim" android:layout_marginHorizontal="@dimen/parentMargin" app:cardBackgroundColor="?colorSurface" app:cardCornerRadius="@dimen/cardCornerRadius" style="@style/Widget.Material3.CardView.Filled">
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+                <TextView android:textAppearance="@style/TextAppearanceTitle" android:textColor="?colorOnSurfaceVariant" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Select backup files (.img) to restore:" android:paddingVertical="8.0dp" />
+                <androidx.recyclerview.widget.RecyclerView android:id="@id/rv_backups" android:fadingEdgeLength="96.0dp" android:layout_width="match_parent" android:layout_height="match_parent" android:requiresFadingEdge="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="32.0dp" android:foreground="?android:selectableItemBackground" android:elevation="@dimen/cardElevation" android:stateListAnimator="@anim/state_list_anim" android:layout_marginHorizontal="@dimen/parentMargin" app:cardBackgroundColor="?colorSurface" app:cardCornerRadius="@dimen/cardCornerRadius" style="@style/Widget.Material3.CardView.Filled">
+            <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:padding="16.0dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.google.android.material.checkbox.MaterialCheckBox android:id="@id/cb_select_all_restore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/select_all" android:layout_marginEnd="16.0dp" />
+                <View android:layout_width="0.0dp" android:layout_height="0.0dp" android:layout_weight="1.0" />
+                <ImageButton android:id="@id/btn_delete_backup" android:background="?selectableItemBackgroundBorderless" android:visibility="gone" android:layout_width="48.0dp" android:layout_height="48.0dp" android:src="@drawable/ic_delete" android:scaleType="centerInside" android:contentDescription="Delete Selected Backups" android:layout_marginEnd="8.0dp" app:tint="?colorError" />
+                <com.google.android.material.button.MaterialButton android:textColor="?colorOnError" android:id="@id/btn_start_restore" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/start_restore" app:backgroundTint="?colorError" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</LinearLayout>

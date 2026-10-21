@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@id/coordinator" android:background="?colorSurfaceVariant" android:fitsSystemWindows="false" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <include android:id="@id/toolbarlayout" layout="@layout/toolbar" />
+    <androidx.core.widget.NestedScrollView android:id="@id/nested_scroll_view" android:paddingBottom="24.0dp" android:fadingEdgeLength="96.0dp" android:layout_width="match_parent" android:layout_height="match_parent" android:requiresFadingEdge="vertical" app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+            <include android:id="@id/dashboard" layout="@layout/dashboard" />
+            <include android:id="@id/wear_chart" layout="@layout/card_wearlevel_history" />
+            <com.google.android.material.card.MaterialCardView android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="@dimen/parentMargin" android:foreground="?android:selectableItemBackground" android:elevation="@dimen/cardElevation" android:stateListAnimator="@anim/state_list_anim" android:layout_marginHorizontal="@dimen/parentMargin" app:cardBackgroundColor="?colorSurface" app:cardCornerRadius="@dimen/cardCornerRadius" app:cardMaxElevation="2.0dp" style="@style/Widget.Material3.CardView.Filled">
+                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent">
+                    <include android:id="@id/wearlevel" layout="@layout/wear_level" />
+                    <include android:id="@id/storagecart" layout="@layout/storage_cart" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <include android:id="@id/card_io_benchmark" layout="@layout/card_io_benchmark" />
+            <include android:id="@id/cardbackuprestore" layout="@layout/card_backup_restore" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

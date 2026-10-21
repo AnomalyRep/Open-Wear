@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <id.openwear.diskhealth.ui.CreditsPreference android:title="@string/credits" android:key="key_credits" />
+    <PreferenceCategory android:layout="@layout/preference_layout_header" android:title="@string/appearances">
+        <Preference android:icon="@drawable/ic_theme" android:layout="@layout/preference_layout_single_full" android:title="@string/title_choose_theme" android:key="@string/key_theme" />
+    </PreferenceCategory>
+    <PreferenceCategory android:layout="@layout/preference_layout_header" android:title="@string/preference_and_dependencies">
+        <Preference android:icon="@drawable/ic_db" android:layout="@layout/preference_layout_top" android:title="@string/saved_pref" android:key="@string/key_getprefs" android:summary="@string/saved_pref_summary" />
+        <Preference android:icon="@drawable/ic_bracket" android:layout="@layout/preference_layout_bottom" android:title="@string/library" android:key="@string/key_dependency" android:summary="@string/dependencies_and_library_used_" />
+    </PreferenceCategory>
+    <PreferenceCategory android:layout="@layout/preference_layout_header" android:title="@string/more">
+        <Preference android:icon="@drawable/ic_web" android:layout="@layout/preference_layout_top" android:title="@string/website" android:key="@string/key_website" android:summary="@string/visit_my_website" />
+        <Preference android:icon="@drawable/ic_telegram" android:layout="@layout/preference_layout_bottom" android:title="@string/title_telegram" android:key="@string/key_telegram" android:summary="@string/telegram_summary" />
+    </PreferenceCategory>
+</PreferenceScreen>

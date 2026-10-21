@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:gravity="center" android:orientation="vertical" android:id="@id/cv_winpart" android:padding="@dimen/parentMargin" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView android:textAppearance="@style/TextAppearanceTitle" android:textStyle="bold" android:gravity="center" android:id="@id/tv_partition_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/internal_storage" android:drawablePadding="4.0dp" android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:drawableStart="@drawable/ic_sd" />
+    <id.openwear.diskhealth.ui.view.PieDiagram android:layout_gravity="center" android:id="@id/pie_chart" android:padding="@dimen/parentMargin" android:layout_width="70.0dp" android:layout_height="70.0dp" android:layout_centerInParent="true" />
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+        <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <View android:background="@drawable/circle_indicator" android:layout_width="12.0dp" android:layout_height="12.0dp" android:backgroundTint="?colorPrimary" />
+            <TextView android:textSize="10.0sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/used" />
+            <TextView android:textSize="10.0sp" android:id="@id/tv_used_size" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/checking" />
+        </LinearLayout>
+        <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1.0">
+            <View android:background="@drawable/circle_indicator" android:layout_width="12.0dp" android:layout_height="12.0dp" android:backgroundTint="?colorSurfaceVariant" />
+            <TextView android:textSize="10.0sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/free" />
+            <TextView android:textSize="10.0sp" android:id="@id/tv_free_size" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/checking" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
+

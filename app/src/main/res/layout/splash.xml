@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:background="?colorSurfaceVariant" android:fitsSystemWindows="true" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:gravity="center" android:orientation="vertical" android:background="?colorSurfaceVariant" android:fitsSystemWindows="true" android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:layout_gravity="center" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:textSize="48.0dp" android:textColor="@color/blue" android:gravity="end" android:id="@id/tv_pharse1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" android:fontFamily="@font/fastrace" android:textAlignment="gravity" />
+            <TextView android:textSize="48.0dp" android:textColor="?colorOnSurface" android:gravity="start" android:id="@id/tv_pharse2" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.2" android:fontFamily="@font/fastrace" android:textAlignment="gravity" />
+        </LinearLayout>
+        <TextView android:textSize="18.0dp" android:textColor="@color/firebase_orange" android:gravity="center" android:id="@id/tv_pharse3" android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="@font/fastrace" android:textAlignment="gravity" />
+        <TextView android:gravity="center" android:layout_gravity="bottom" android:id="@id/tv_pharse4" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/author" android:fontFamily="@font/sanfranciscoprorounded" android:textAlignment="gravity" />
+    </LinearLayout>
+    <id.openwear.verncopyright.BlurLayout android:layout_gravity="center" android:id="@id/blursplash" android:layout_width="match_parent" android:layout_height="match_parent" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

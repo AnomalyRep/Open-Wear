@@ -1,0 +1,291 @@
+{
+  "meta": {
+    "target": "Wear Level Insight_3.6.0.apk",
+    "path": "C:\\Users\\Arvin\\Downloads\\Wear_level\\Wear Level Insight_3.6.0.apk",
+    "sha256": "98e1962c0814672305423f0d8665c79732d347d793b1cce027d3a24ebf54f2a5",
+    "size_bytes": 4822122,
+    "analyzed_with": ["REA 6.7.0 (archive inventory, apktool 3.0.3 resource decode)", "apktool 3.0.3 (full smali decode)", "apksigner 34.0.0", "raw ASCII string extraction"],
+    "executed": false,
+    "evidence_ids": [
+      "ev_950090d705a36032e92cd7ea067f616a88bfc765aa0fac083b13bce07437d71f",
+      "ev_2112648dba8b224bc59493d6a2841b3f86186a9a1d9369a99086e3461da72cf2",
+      "ev_199e53f81121bca62a784a6fe5fb024ed7fb4a4a72649a82b08075b2440bd14b"
+    ]
+  },
+  "app": {
+    "package": "id.kuato.diskhealth",
+    "label": "Wear Level Insight",
+    "version_name": "3.6.0",
+    "version_code": 3,
+    "min_sdk": 29,
+    "target_sdk": 33,
+    "compile_sdk": 33,
+    "application_class": "id.kuato.diskhealth.ui.Applications",
+    "permissions": ["android.permission.INTERNET", "android.permission.ACCESS_SUPERUSER"],
+    "components": {
+      "activities": [
+        {"name": "id.kuato.diskhealth.ui.SplashActivity", "exported": true, "roles": ["MAIN", "LAUNCHER"]},
+        {"name": "id.kuato.diskhealth.ui.activity.MainActivity", "exported": false},
+        {"name": "id.kuato.diskhealth.ui.activity.FragmentActivity", "exported": false},
+        {"name": "id.kuato.diskhealth.crash.activity.Erase", "exported": false},
+        {"name": "id.kuato.diskhealth.crash.activity.DefaultErrorActivity", "exported": false, "process": ":error_activity"}
+      ],
+      "receivers": [
+        {"name": "id.kuato.diskhealth.provider.WearLevelWidget", "exported": true, "intent_filter": "android.appwidget.action.APPWIDGET_UPDATE", "meta_data": "android.appwidget.provider=@xml/wearlevel"}
+      ],
+      "providers": [
+        {"name": "id.kuato.diskhealth.crash.provider.CrashInitProvider", "exported": false, "authorities": "id.kuato.diskhealth.crashinitprovider"},
+        {"name": "androidx.startup.InitializationProvider", "exported": false}
+      ]
+    },
+    "inventory": {
+      "entries": 828,
+      "dex_count": 1,
+      "dex_size": 1845308,
+      "native_libs": 0,
+      "resources": 754,
+      "assets": ["assets/dexopt/baseline.prof", "assets/dexopt/baseline.profm", "assets/main.jar"],
+      "kotlin_builtins": 7
+    }
+  },
+  "security": {
+    "signature_schemes": {"v1": false, "v2": false, "v3": true, "v4": false},
+    "signer_dn": "CN=WLI-Patch",
+    "signer_algorithm": "RSA-2048 self-signed",
+    "note": "META-INF/WLI.MF, WLI.SF and WLI.RSA are present but the v1 JAR signature does not verify; only the v3 scheme verifies with a non-original certificate. The package was modified and re-signed.",
+    "anti_tamper_string": "Modification detected. Please use the original Wear Level Insight",
+    "root_required": true,
+    "hidden_payload": {
+      "path": "assets/main.jar",
+      "size": 3433,
+      "member": "classes.dex",
+      "member_size": 6284,
+      "classes_and_symbols": [
+        "IPCMain",
+        "daemon", "loop", "start", "stop", "exit",
+        "android.os.ServiceManager", "android.os.Binder", "android.os.Parcel",
+        "android.app.ActivityThread", "createPackageContext",
+        "java.lang.reflect.Method/Field/Constructor", "Binder.transact",
+        "com.topjohnwu.superuser.internal.IRootServiceManager",
+        "com.lge.systemservice.core.integrity.IntegrityManager"
+      ],
+      "interpretation": "Privileged helper dex: root service (libsu) plus reflective/Binder access to the LG IntegrityManager hidden system service. Not UI code."
+    }
+  },
+  "data_sources": [
+    {
+      "id": "emmc_life_time",
+      "storage": "eMMC",
+      "command": "find /sys/block/mmcblk0/device/ -type f -name 'life_time'",
+      "follow_up": "cat <path>",
+      "raw_format_example": "0x01 0x02",
+      "fields": ["LIFE_TIME_EST_TYP_A", "LIFE_TIME_EST_TYP_B"]
+    },
+    {
+      "id": "ufs_health",
+      "storage": "UFS",
+      "command": "/system/bin/insmod /data/adb/wearlevel/ufshealth.ko 2>/dev/null; echo /proc/ufs_health",
+      "follow_up": "cat /proc/ufs_health",
+      "fields": ["lifetime A", "lifetime B"],
+      "note": "Requires the vendor kernel module ufshealth.ko at /data/adb/wearlevel/ufshealth.ko."
+    },
+    {
+      "id": "lifetime_nodes",
+      "storage": "UFS/other",
+      "command": "find /sys/devices/ -type f -name 'lifetime*' | sed -e ':a;N;$!ba;s/\\n/ /g'",
+      "follow_up": "cat <path>"
+    },
+    {
+      "id": "diskstats",
+      "storage": "usage categories",
+      "command": "dumpsys diskstats | grep '<category> Size'",
+      "categories": ["App Size", "App Cache Size", "Audio Size", "Downloads Size", "Other Size", "Photos Size", "System Size", "Videos Size"]
+    },
+    {
+      "id": "cpuinfo",
+      "command": "cat /proc/cpuinfo",
+      "parser": "line starting with 'Hardware' -> substring after ':'"
+    },
+    {
+      "id": "gpu_model",
+      "command": "cat /sys/class/kgsl/kgsl-3d0/gpu_model",
+      "fallback": "GLES20.glGetString(GL_RENDERER)"
+    },
+    {
+      "id": "battery_charge_full",
+      "command": "cat /sys/class/power_supply/battery/charge_full | cut -c1-4",
+      "unit": "uAh, divided by 1000 for mAh"
+    },
+    {
+      "id": "power_profile",
+      "command": "reflection: com.android.internal.os.PowerProfile#getBatteryCapacity()"
+    }
+  ],
+  "parsing_rules": {
+    "output_split": "replace 'a /s' -> 'a:/s', replace ' 0' -> ':0', split on ':'",
+    "value_split": "split the cat output on ':' after replacing ' 0' with ':0'; index 0 = lifetime A code, index 1 = lifetime B code",
+    "two_paths": "two paths in the command output mean multi-level-cell / two life-time sources (UFS MLC)",
+    "percent_mapping": {
+      "0x01": 100, "0x02": 90, "0x03": 80, "0x04": 70, "0x05": 60,
+      "0x06": 50, "0x07": 40, "0x08": 30, "0x09": 20, "0x0a": 10, "0x0b": 1,
+      "default": 0
+    }
+  },
+  "storage_types": [
+    "eMMC NAND-Flash Storage [High Speed Single Level Cell]",
+    "UFS NAND-Flash Storage [High Speed Single Level Cell]",
+    "UFS NAND-Flash Storage [Multi Level Cell]"
+  ],
+  "ui_model": {
+    "dashboard": [
+      {"field": "device_model", "id": "tv_device_model", "format": "%s"},
+      {"field": "device", "id": "tv_device", "format": "Device Model : %s"},
+      {"field": "processor", "id": "tv_processor", "format": "Processors : %s"},
+      {"field": "graphic", "id": "tv_graphic", "format": "Graphics : %s"},
+      {"field": "memory", "id": "tv_memory", "format": "Memory Variant : %s"},
+      {"field": "storage", "id": "tv_storage_capacity", "format": "Storage Variant : %s"},
+      {"field": "power_profile", "id": "tv_power_profile", "format": "Power Profile : %s mA/h"},
+      {"field": "battery_capacity", "id": "tv_battery_capacity", "format": "Battery Capacity : %s mA/h"}
+    ],
+    "wear_level": {
+      "type": "tv_disk_type",
+      "group_a": {"title": "tv_wear_level_title_a", "codes": ["tv_hex_1_a", "tv_hex_2_a"], "percents": ["tv_wear_level_percent_1a", "tv_wear_level_percent_2a"], "progress": ["wear_level_progress_1a", "wear_level_progress_2a"]},
+      "group_b": {"title": "tv_wear_level_title_b", "codes": ["tv_hex_1_b", "tv_hex_2_b"], "percents": ["tv_wear_level_percent_1b", "tv_wear_level_percent_2b"], "progress": ["wear_level_progress_1b", "wear_level_progress_2b"]},
+      "titles": {"group_a": "Wear estimate lifetime", "group_b": "Cycle estimate lifetime"}
+    },
+    "storage": {
+      "internal": ["storage_progress", "tv_storage_percent", "tv_total_storage", "tv_used_storage", "tv_free_storage"],
+      "sdcard": ["sdcard_progress", "tv_sdcard_percent", "tv_total_sdcard", "tv_used_sdcard", "tv_free_sdcard"],
+      "formats": {"total": "Total : %s", "used": "Used : %s", "free": "Free : %s", "sdcard": "Mounted : %s"}
+    },
+    "benchmark": {
+      "title": "I/O Speed Benchmark",
+      "ids": ["cv_run_bench", "tv_run_bench", "speed_progress", "tv_speed_percent", "tv_speed_latency", "tv_bench_hint"],
+      "metric": "write/read MB/s plus median 4 KiB sync latency"
+    },
+    "summary": "tv_summary",
+    "author": "tv_author",
+    "loading_overlay": ["blur", "tv_loading"]
+  },
+  "preferences": {
+    "file": "<package>_preferences",
+    "keys": {
+      "key_hex1a": "lifetime code 1a (percent source)",
+      "key_hex2a": "lifetime code 2a",
+      "key_hex1b": "lifetime code 1b",
+      "key_hex2b": "lifetime code 2b"
+    }
+  },
+  "widget": {
+    "layout": "widget_layout",
+    "provider": "id.kuato.diskhealth.provider.WearLevelWidget",
+    "info": "@xml/wearlevel",
+    "ids": {
+      "title": "widget_title",
+      "titles": ["widget_text_title_a", "widget_text_title_b"],
+      "text": ["widget_hex1a", "widget_hex2a", "widget_hex1b", "widget_hex2b"],
+      "progress": ["circular_progress_bar_widget_hex1a", "circular_progress_bar_widget_hex2a", "circular_progress_bar_widget_hex1b", "circular_progress_bar_widget_hex2b"],
+      "frames": ["fl_widget_hex1a", "fl_widget_hex2a", "fl_widget_hex1b", "fl_widget_hex2b"]
+    },
+    "behavior": "Reads key_hex* prefs, hides empty gauges, sets progress 0..100, click opens MainActivity."
+  },
+  "strings": {
+    "wearlevel": "Wear estimate lifetime",
+    "lifecycle": "Cycle estimate lifetime",
+    "storage_info": "Storage Informations",
+    "device": "Device Model : %s",
+    "processor": "Processors : %s",
+    "graphic": "Graphics : %s",
+    "memory": "Memory Variant : %s",
+    "storage_variant": "Storage Variant : %s",
+    "powerprofile": "Power Profile : %s mA/h",
+    "batterycapacity": "Battery Capacity : %s mA/h",
+    "sdcard_name": "Mounted : %s",
+    "total_storage": "Total : %s",
+    "used_storage": "Used : %s",
+    "free_storage": "Free : %s",
+    "io_title": "I/O Speed Benchmark",
+    "run_bench": "Run I/O Bench ->",
+    "need_root_message": "Root access is required. Please root your device to use this app.",
+    "mod_msg": "Modification detected. Please use the original Wear Level Insight",
+    "disclaimer": "The storage in your device has a specified lifetime set by the manufacturer. This application is designed to check the lifespan of your storage. All data shown in this app is based on data dumps from your device. If there is any inaccuracy in the displayed data, you can try changing the kernel on your device.",
+    "emmc_hint_short": "eMMC is non-volatile storage in portable devices that can use different types of NAND flash memory: SLC, MLC, and TLC. MLC is cheaper than SLC, but has lower endurance. eMMC with MLC has two lifetime ratings: lifetime A and lifetime B. Actual endurance depends on many factors, so manufacturer estimates may vary.",
+    "ufs_hint_short": "UFS Lifetime A and B are key parameters for measuring flash storage lifespan in UFS devices. Lifetime A measures data limit before damage, and Lifetime B measures duration of use before damage. Higher values mean better quality and determine when storage lifetime ends.",
+    "author": "Vern Kuato @2023",
+    "created_by": "Created by KuatoDev-Projects",
+    "credits": ["Ida Bagus Rama Mahendra", "mobxprjkt a.k.a c3eru@github", "Nabil ABA", "Otang45"]
+  },
+  "links": {
+    "instagram": "https://instagram.com/kuatodev",
+    "youtube": "https://youtube.com/kuatodev",
+    "telegram_channel": "https://t.me/vernkuato",
+    "telegram_group": "https://t.me/+u4MX3zTsAnNhYWI1",
+    "saweria": "https://saweria.co/kuatodev",
+    "paypal": "https://paypal.me/vernkuato"
+  },
+  "device_database": {
+    "source_class": "androidx.emoji2.text.k (R8-obfuscated; contains a switch on android.os.Build.DEVICE)",
+    "codenames": ["santoni", "sailfish", "note 9 pro", "aliothin", "CPH2447", "curtana", "walleye", "redmi 9 power", "M2006J10C", "beryllium", "bramble", "wayne", "vince", "tulip", "spesn", "sargo", "lemon", "juice", "flame", "coral", "chime", "bhima", "atoll", "vayu", "star", "spes", "mido", "lime", "hlte", "beyond1", "M2102j20", "M2010J19", "poco m3", "redmi note 7 pro", "meizu m6", "redmi 9t", "willow", "whyred", "violet", "asus_I001", "taimen", "sm6115", "sirius", "redfin", "pomelo", "marlin", "ginkgo", "redmi note 8", "redmi note 7", "redmi note 5", "redmi note 4", "dipper", "citrus", "bonito", "lavender", "alioth", "sunfish", "op594dl1"],
+    "models": ["Redmi 4X", "Google Pixel 1", "Redmi K30 Ultra", "POCO F1", "Pixel 4a 5G", "MI 6X", "Redmi 5 Plus", "Redmi Note 6 pro", "Pixel 3a", "Pixel 4 XL", "Pixel 4", "Redmi Note 9 Pro", "Galaxy S9", "Redmi Note 11", "Samsung Galaxy Note 3 LTE", "Galaxy S9+", "POCO X3 PRO", "ASUS ROG 2", "MI 8 SE", "Pixel 5", "Google Pixel XL", "Redmi Note 5 Pro", "MI8", "CHIME (JUICE)", "Pixel 3a XL", "POCO F3", "Pixel 4a", "OnePlus 11"],
+    "socs": ["Snapdragon 660", "Snapdragon 765G", "Snapdragon 435", "Dimensity 1000+", "Snapdragon 632", "Snapdragon 855", "Snapdragon 720G", "Exynos 9810", "Snapdragon 680 4G", "Snapdragon 800", "Snapdragon 860", "Snapdragon 675", "Snapdragon 855+", "Snapdragon 710", "Snapdragon 821", "Snapdragon 665", "Snapdragon 636", "Snapdragon 625", "Snapdragon 845", "Snapdragon 662", "Snapdragon 670", "Snapdragon 870 5G", "Snapdragon 730", "Snapdragon 8 Gen 2"],
+    "gpus": ["Adreno 618", "Adreno 512", "Adreno 620", "Adreno 505", "MALI-G77 9 Core", "Mali-G72 MP18", "Adreno 330", "Mali-T860 2 Core", "Adreno 612", "Adreno 640", "Adreno 616", "Adreno 530", "Adreno 509", "Adreno 506", "Adreno 630", "Adreno 610", "Adreno 615", "Adreno 650", "Adreno 740"],
+    "artwork_urls": ["https://i.ibb.co/mz7Q3rW/star.png", "https://i.ibb.co/GPD34d6/whyred.png", "https://i.ibb.co/7Xc4P25/unknown.webp", "https://i.ibb.co/fndwVbZ/tulip.png", "https://i.ibb.co/TgmcMgG/flame.png", "https://i.ibb.co/J2HyK2t/spes.png", "https://i.ibb.co/MnLm6ny/HLTE.png", "https://i.ibb.co/mT0Wwjx/vayu2.webp", "https://i.ibb.co/7nPVWV9/meizu-m6.png", "https://i.ibb.co/VNLQ28L/rog2.png", "https://i.ibb.co/5BYjymz/sirius.png", "https://i.ibb.co/vLzb91T/redfin.png", "https://i.ibb.co/8cP5bfW/pixel1.png", "https://i.ibb.co/j42xjjT/ginkgo.png", "https://i.ibb.co/VNsgzJ2/mido.png", "https://i.ibb.co/DgJ6z5v/Alioth.png", "https://i.ibb.co/WF1ZxKc/JUICE.png", "https://i.ibb.co/DCqgrHM/sargo.png", "https://i.ibb.co/p4cx964/lavender.png", "https://i.ibb.co/9c85rrj/curtana.png", "https://i.ibb.co/19crvpn/brmable.png", "https://i.ibb.co/mHBpHSb/oneplus11.webp", "https://i.ibb.co/s1THFTf/unknown.webp"],
+    "artwork_map": {
+      "alioth": "https://i.ibb.co/9c85rrj/curtana.png",
+      "aliothin": "https://i.ibb.co/9c85rrj/curtana.png",
+      "asus_I001": "https://i.ibb.co/VNLQ28L/rog2.png",
+      "atoll": "https://i.ibb.co/9c85rrj/curtana.png",
+      "beryllium": "https://i.ibb.co/DgJ6z5v/Alioth.png",
+      "bhima": "https://i.ibb.co/mT0Wwjx/vayu2.webp",
+      "bonito": "https://i.ibb.co/DCqgrHM/sargo.png",
+      "bramble": "https://i.ibb.co/19crvpn/brmable.png",
+      "chime": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "citrus": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "coral": "https://i.ibb.co/TgmcMgG/flame.png",
+      "CPH2447": "https://i.ibb.co/mHBpHSb/oneplus11.webp",
+      "curtana": "https://i.ibb.co/9c85rrj/curtana.png",
+      "dipper": "https://i.ibb.co/DgJ6z5v/Alioth.png",
+      "flame": "https://i.ibb.co/TgmcMgG/flame.png",
+      "ginkgo": "https://i.ibb.co/j42xjjT/ginkgo.png",
+      "hlte": "https://i.ibb.co/MnLm6ny/HLTE.png",
+      "juice": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "lavender": "https://i.ibb.co/p4cx964/lavender.png",
+      "lemon": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "lime": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "M2006J10C": "https://i.ibb.co/s1THFTf/unknown.webp",
+      "M2010J19": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "M2102j20": "https://i.ibb.co/mT0Wwjx/vayu2.webp",
+      "marlin": "https://i.ibb.co/8cP5bfW/pixel1.png",
+      "meizu m6": "https://i.ibb.co/7nPVWV9/meizu-m6.png",
+      "mido": "https://i.ibb.co/VNsgzJ2/mido.png",
+      "note 9 pro": "https://i.ibb.co/9c85rrj/curtana.png",
+      "poco m3": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "pomelo": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "redfin": "https://i.ibb.co/vLzb91T/redfin.png",
+      "redmi 9 power": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "redmi 9t": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "redmi note 4": "https://i.ibb.co/VNsgzJ2/mido.png",
+      "redmi note 7": "https://i.ibb.co/p4cx964/lavender.png",
+      "redmi note 7 pro": "https://i.ibb.co/p4cx964/lavender.png",
+      "redmi note 8": "https://i.ibb.co/j42xjjT/ginkgo.png",
+      "sailfish": "https://i.ibb.co/8cP5bfW/pixel1.png",
+      "santoni": "https://i.ibb.co/7Xc4P25/unknown.webp",
+      "sargo": "https://i.ibb.co/DCqgrHM/sargo.png",
+      "sirius": "https://i.ibb.co/5BYjymz/sirius.png",
+      "sm6115": "https://i.ibb.co/WF1ZxKc/JUICE.png",
+      "spes": "https://i.ibb.co/J2HyK2t/spes.png",
+      "spesn": "https://i.ibb.co/J2HyK2t/spes.png",
+      "star": "https://i.ibb.co/mz7Q3rW/star.png",
+      "sunfish": "https://i.ibb.co/19crvpn/brmable.png",
+      "taimen": "https://i.ibb.co/8cP5bfW/pixel1.png",
+      "tulip": "https://i.ibb.co/fndwVbZ/tulip.png",
+      "vayu": "https://i.ibb.co/mT0Wwjx/vayu2.webp",
+      "violet": "https://i.ibb.co/p4cx964/lavender.png",
+      "walleye": "https://i.ibb.co/8cP5bfW/pixel1.png",
+      "whyred": "https://i.ibb.co/GPD34d6/whyred.png",
+      "willow": "https://i.ibb.co/j42xjjT/ginkgo.png"
+    },
+    "artwork_local": "app/src/main/res/drawable-nodpi/device_*.webp (runtime uses these bundled copies; no network)",
+    "limitations": "The codename -> (model, SoC, GPU, artwork) switch was R8-flattened; the pairing is control-flow dependent and was not fully reconstructed. Runtime values from Build/proc are used by the rebuild instead."
+  }
+}

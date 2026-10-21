@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="vertical" android:id="@id/cv_wear_level" android:background="@drawable/rounded_background" android:padding="4.0dp" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:textAppearance="@style/TextAppearanceTitle" android:textColor="@color/colorPrimary" android:ellipsize="marquee" android:gravity="center" android:id="@id/tv_disk_type" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Storage Health" android:singleLine="true" android:marqueeRepeatLimit="marquee_forever" />
+    <LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <include android:id="@id/wear_a" layout="@layout/widget_wear_a" />
+        <include android:id="@id/wear_b" layout="@layout/widget_wear_b" />
+    </LinearLayout>
+</LinearLayout>

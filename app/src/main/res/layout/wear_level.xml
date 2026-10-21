@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="vertical" android:id="@id/cv_wear_level" android:padding="@dimen/parentMargin" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="180.0dp" android:layout_weight="1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView android:textAppearance="@style/TextAppearanceTitle" android:textStyle="bold" android:gravity="start" android:id="@id/tv_disk_type" android:focusable="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:drawablePadding="4.0dp" android:drawableStart="@drawable/ic_disk_health" />
+    <LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent">
+        <include android:id="@id/wear_a" layout="@layout/wear_a" />
+        <include android:id="@id/wear_b" layout="@layout/wear_b" />
+    </LinearLayout>
+</LinearLayout>

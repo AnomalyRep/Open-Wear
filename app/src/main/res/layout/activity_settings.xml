@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_gravity="center_vertical" android:orientation="vertical" android:background="?colorSurfaceVariant" android:fitsSystemWindows="false" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.fragment.app.FragmentContainerView android:id="@id/fragment_container" android:paddingBottom="24.0dp" android:fadingEdgeLength="96.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:requiresFadingEdge="vertical" />
+</LinearLayout>

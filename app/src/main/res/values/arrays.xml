@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="msg_array">
+        <item>Did you know that maintaining sufficient free storage can help prevent a decrease in disk health?</item>
+        <item>"Did you know that storing large files on your device's internal storage can contribute to a decrease in disk health?"</item>
+        <item>Did you know that deleting large files can potentially have a negative impact on disk health?</item>
+        <item>Did you know that regularly deleting large files can help prevent a decrease in disk health?</item>
+    </string-array>
+    <string-array name="theme_modes">
+        <item>@string/current_follow_system</item>
+        <item>@string/current_light_theme</item>
+        <item>@string/current_dark_theme</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>@string/current_follow_system</item>
+        <item>@string/current_light_theme</item>
+        <item>@string/current_dark_theme</item>
+    </string-array></resources>

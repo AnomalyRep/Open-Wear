@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.AppBarLayout android:id="@id/appbar" android:focusable="false" android:clickable="false" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="?colorSurfaceVariant" app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.google.android.material.appbar.MaterialToolbar android:gravity="center_vertical" android:layout_gravity="center_vertical" android:id="@id/toolbar" android:focusable="false" android:clickable="false" android:layout_width="match_parent" android:layout_height="wrap_content" android:animateLayoutChanges="true" app:subtitleCentered="false" app:subtitleTextAppearance="@style/Toolbar.SubtitleText" app:titleCentered="false" app:titleTextAppearance="@style/Toolbar.TitleText" />
+</com.google.android.material.appbar.AppBarLayout>

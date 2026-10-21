@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView android:paddingBottom="12.0dp" android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:foreground="?android:selectableItemBackground" app:cardBackgroundColor="@color/transparent" app:cardCornerRadius="@dimen/cardCornerRadius" style="@style/Widget.Material3.CardView.Filled"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:paddingBottom="12.0dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+            <LinearLayout android:layout_gravity="center" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:textSize="48.0dp" android:textColor="@color/blue" android:gravity="end" android:id="@id/tv_header_openwear" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" android:fontFamily="@font/fastrace" android:textAlignment="gravity" />
+                <TextView android:textSize="48.0dp" android:textColor="@color/white" android:gravity="start" android:id="@id/tv_header_dev" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.2" android:fontFamily="@font/fastrace" android:textAlignment="gravity" />
+            </LinearLayout>
+            <TextView android:textSize="18.0dp" android:textColor="@color/orange" android:gravity="center" android:id="@id/tv_header_projects" android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="@font/fastrace" android:textAlignment="gravity" />
+        </LinearLayout>
+        <ImageView android:id="@id/iv_app_icon" android:background="@drawable/circle" android:layout_width="72.0dp" android:layout_height="72.0dp" android:src="@drawable/ic_launcher_foreground" android:scaleType="centerCrop" android:backgroundTint="@color/white" android:layout_marginVertical="12.0dp" />
+        <TextView android:textAppearance="@style/TextAppearanceTitle" android:textStyle="bold" android:textColor="?colorOnSurface" android:gravity="center" android:id="@id/tv_app_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4.0dp" android:text="@string/app_name" />
+        <TextView android:textAppearance="@style/TextAppearanceBody" android:textStyle="bold|italic" android:gravity="center" android:id="@id/tv_app_tagline" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4.0dp" android:text="@string/tagline" android:fontFamily="@font/sanfranciscoprorounded" />
+        <TextView android:textAppearance="@style/TextAppearanceBody" android:gravity="center" android:id="@id/appversion" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/version_format" android:fontFamily="@font/sanfranciscoprorounded" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

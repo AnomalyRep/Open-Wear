@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorOnPrimary">#ff00325a</color>
+    <color name="colorOnPrimaryContainer">#ffd6e3ff</color>
+    <color name="colorOnSecondary">#ff332d41</color>
+    <color name="colorOnSecondaryContainer">#ffd6e3ff</color>
+    <color name="colorOnSurface">#ffe6e1e5</color>
+    <color name="colorOnSurfaceInverse">#ff313033</color>
+    <color name="colorOnSurfaceVariant">#ffcac4d0</color>
+    <color name="colorOnTertiary">#ff492532</color>
+    <color name="colorOnTertiaryContainer">#ffcce5ff</color>
+    <color name="colorPrimary">#ff2196f3</color>
+    <color name="colorPrimaryContainer">#ff00468b</color>
+    <color name="colorPrimaryInverse">#ff90caf9</color>
+    <color name="colorSecondary">#ff90caf9</color>
+    <color name="colorSecondaryContainer">#ff00468b</color>
+    <color name="colorSurface">#ff1e1e1e</color>
+    <color name="colorSurfaceInverse">#ffe6e1e5</color>
+    <color name="colorSurfaceVariant">#ff49454f</color>
+    <color name="colorTertiary">#ff4fc3f7</color>
+    <color name="colorTertiaryContainer">#ff00497b</color>
+    <color name="greyout">#5affffff</color>
+    <color name="layout_background">#ff393939</color>
+    <color name="orange">#ffff9800</color>
+    <color name="semibackground">#ff242424</color>
+    <color name="translucent">#eb292929</color>
+    <color name="white_translucent">#48000000</color>
+    <color name="mtrl_error">#fff2b8b5</color>
+    <color name="blue">#ff4fc3f7</color>
+    <color name="holo_red_dark">#ffff5252</color>
+    <color name="red">#ffff5252</color>
+</resources>
+

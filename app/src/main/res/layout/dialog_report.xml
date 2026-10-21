@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:foreground="?android:selectableItemBackground" android:adjustViewBounds="true" android:animateLayoutChanges="true" android:stateListAnimator="@anim/state_list_anim" android:layout_marginVertical="@dimen/parentMargin" app:cardBackgroundColor="@color/translucent" app:cardCornerRadius="@dimen/cardCornerRadius" app:cardMaxElevation="2.0dp" style="@style/Widget.Material3.CardView.Filled"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:orientation="vertical" android:padding="24.0dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:textAppearance="@style/TextAppearanceTitle" android:textStyle="bold" android:textColor="?colorPrimary" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16.0dp" android:text="@string/wear_level_history" />
+        <ScrollView android:scrollbars="vertical" android:fadingEdgeLength="96.0dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1.0" android:fadeScrollbars="false" android:requiresFadingEdge="vertical">
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:textAppearance="@style/TextAppearanceTitle" android:textStyle="bold" android:textColor="?colorPrimary" android:id="@id/tv_title_a" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8.0dp" android:text="@string/wear_level" />
+                <TableLayout android:id="@id/table_history_a" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16.0dp" android:stretchColumns="0" />
+                <View android:id="@id/divider_ab" android:background="?android:listDivider" android:layout_width="match_parent" android:layout_height="1.0dp" android:layout_marginBottom="16.0dp" />
+                <TextView android:textAppearance="@style/TextAppearanceTitle" android:textStyle="bold" android:textColor="@android:color/holo_red_dark" android:id="@id/tv_title_b" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8.0dp" android:text="@string/cycle_usages" />
+                <TableLayout android:id="@id/table_history_b" android:layout_width="match_parent" android:layout_height="wrap_content" android:stretchColumns="0" />
+            </LinearLayout>
+        </ScrollView>
+        <com.google.android.material.button.MaterialButton android:layout_gravity="end" android:id="@id/btnClose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16.0dp" android:text="@string/close" style="@style/Widget.Material3.Button.TextButton" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

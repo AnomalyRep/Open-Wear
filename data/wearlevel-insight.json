@@ -1,0 +1,293 @@
+{
+  "meta": {
+    "target": "Wear-Level-Insight-v4.0.1.apk",
+    "path": "C:\\Users\\Arvin\\Downloads\\Wear_level\\Wear-Level-Insight-v4.0.1.apk",
+    "sha256": "E1CB553DEA1BB7A77DFD43F0D0D7E923208FB27F1B80444990CF4CD551322D3F",
+    "size_bytes": 5730832,
+    "analyzed_with": [
+      "apktool 3.0.3 (resource decode)",
+      "JADX (Java/Kotlin source recovery)",
+      "aapt2 / apksigner 35.0.0 (manifest and signature verification)",
+      "static source review"
+    ],
+    "executed": false,
+    "analysis_type": "authorized static reverse engineering",
+    "output_project": "C:\\Users\\Arvin\\Downloads\\Wear_level\\WearLevelRebuild",
+    "historical_analysis": "data/wearlevel-insight-3.6.json (previous 3.6.0 target)"
+  },
+  "app": {
+    "package": "id.vern.wearlevelinsight",
+    "label": "Wear Level Insight",
+    "version_name": "4.0.1",
+    "version_code": 2,
+    "min_sdk": 29,
+    "target_sdk": 36,
+    "compile_sdk": 36,
+    "application_class": null,
+    "permissions": [
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.INTERNET",
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.MANAGE_EXTERNAL_STORAGE",
+      "android.permission.POST_NOTIFICATIONS",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "android.permission.SCHEDULE_EXACT_ALARM",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.GET_PACKAGE_SIZE",
+      "android.permission.QUERY_ALL_PACKAGES"
+    ],
+    "components": {
+      "activities": [
+        {"name": "id.vern.wearlevelinsight.activity.SplashActivity", "exported": true, "roles": ["MAIN", "LAUNCHER"]},
+        {"name": "id.vern.wearlevelinsight.activity.MainActivity", "exported": false},
+        {"name": "id.vern.wearlevelinsight.activity.SettingsActivity", "exported": false},
+        {"name": "id.vern.wearlevelinsight.activity.BackupRestoreActivity", "exported": false},
+        {"name": "id.vern.wearlevelinsight.activity.CrashActivity", "exported": false}
+      ],
+      "receivers": [
+        {"name": "id.vern.wearlevelinsight.widgets.DashboardWidgetProvider", "exported": true, "meta_data": "android.appwidget.provider=@xml/dashboard_widget"},
+        {"name": "id.vern.wearlevelinsight.widgets.WearlevelWidgetProvider", "exported": true, "meta_data": "android.appwidget.provider=@xml/widget_wearlevel"}
+      ],
+      "providers": [
+        {"name": "io.github.mohammedbaqernull.logger.logwire.LogWireInitializer", "authorities": "id.vern.wearlevelinsight.logwire.initializer", "exported": true},
+        {"name": "androidx.startup.InitializationProvider", "authorities": "id.vern.wearlevelinsight.androidx-startup", "exported": false}
+      ]
+    },
+    "inventory": {
+      "dex_count": 1,
+      "dex_size": 2101080,
+      "native_libs": 0,
+      "assets": [
+        "assets/dexopt/baseline.prof",
+        "assets/dexopt/baseline.profm",
+        "assets/disclaimer.html",
+        "assets/main.jar"
+      ]
+    }
+  },
+  "security": {
+    "signature_schemes": {"v1": false, "v2": false, "v3": true, "v3.1": false, "v4": false},
+    "signer_identity": "historical original publisher; DN omitted after the OpenWear rebrand",
+    "signer_sha256": "40079660368dd70dc33506e4eec90df94d8cab7a49d46f55dbbf24765c84f05b",
+    "root_required": true,
+    "bundled_payload": {
+      "path": "assets/main.jar",
+      "size": 3656,
+      "member": "classes.dex",
+      "member_size": 6704,
+      "symbols": [
+        "IPCMain",
+        "daemon", "loop", "start", "stop", "exit",
+        "com.topjohnwu.superuser.internal.RootServerMain",
+        "com.topjohnwu.superuser.internal.IRootServiceManager",
+        "com.lge.systemservice.core.integrity.IntegrityManager",
+        "android.os.ServiceManager", "android.os.Binder"
+      ],
+      "interpretation": "Privileged libsu root-service payload plus reflective/Binder access to the LG IntegrityManager service. Not UI logic; omitted from the clean-room rebuild."
+    }
+  },
+  "port": {
+    "strategy": "clean-room Kotlin + XML reimplementation from static analysis",
+    "application_id": "id.openwear.diskhealth",
+    "namespace": "id.openwear.diskhealth",
+    "version_name": "4.0.1",
+    "version_code": 2,
+    "min_sdk": 29,
+    "target_sdk": 34,
+    "compile_sdk": 34,
+    "agp": "8.5.2",
+    "kotlin": "1.9.24",
+    "gradle": "8.7",
+    "material": "1.12.0",
+    "package_note": "OpenWear uses id.openwear.diskhealth; the package name contains no build or vendor suffix. The distinct applicationId preserves side-by-side install and avoids impersonating the original package.",
+    "resource_source": "decoded v4.0.1 resources: layouts, drawables, webp device art, fonts, menu, anim, XML preferences, widget XML, mipmap, assets/disclaimer.html",
+    "custom_views": [
+      "ui/view/HistoryChartView.kt replaces MPAndroidChart LineChart",
+      "ui/view/PieDiagram.kt replaces the original custom pie",
+      "ui/view/GaugeView.kt renders the 270-degree benchmark gauge"
+    ],
+    "replacements": {
+      "root_shell": "data/Shell.kt direct su -c helper instead of libsu",
+      "artwork": "locally bundled drawable-nodpi/device_*.webp instead of Coil + i.ibb.co URLs",
+      "dialogs": "local DialogFactory/Ui card and list dialogs",
+      "logging": "LogWire provider omitted (diagnostics only)",
+      "payload": "assets/main.jar omitted"
+    },
+    "theme": {
+      "base": "Theme.Material3.DayNight.NoActionBar",
+      "light_primary": "#1976d2",
+      "light_surface": "#ffffff",
+      "night_primary": "#2196f3",
+      "night_surface": "#1e1e1e",
+      "note": "v4 hard-coded text color #b6202020 replaced with theme-aware colors; cards keep the v4 palette."
+    },
+    "edge_to_edge": "transparent status bar + root top padding from system-bar insets, mirroring v4 p042q0.a.e"
+  },
+  "runtime": {
+    "wear_scan": {
+      "prefs_file": "<package>_preferences",
+      "order": [
+        "find /sys/block/mmcblk0/device/ -type f -name 'life_time*' | sed -e ':a;N;$!ba;s/\\n/ /g'",
+        "find /dev/block/mmcblk0/device/ -type f -name 'life_time*' | sed -e ':a;N;$!ba;s/\\n/ /g'",
+        "ls -1d /sys/devices/platform/soc/*ufshc*/health /sys/devices/platform/soc/*ufs*/health /sys/devices/platform/*ufshc*/health /sys/class/scsi_host/host*/device/health /sys/class/scsi_device/*/device/health /sys/block/sd*/device/health 2>/dev/null | head -n 1",
+        "cat <health path>",
+        "find /sys/devices/ -type f -name 'life_time*' | sed -e ':a;N;$!ba;s/\\n/ /g'",
+        "find /sys/devices/ -type f -name 'lifetime*' | sed -e ':a;N;$!ba;s/\\n/ /g'",
+        "cat /proc/ufs_health 2>/dev/null"
+      ],
+      "ufs_health": {
+        "attributes": ["DeviceLifeTimeEstA", "DeviceLifeTimeEstB"],
+        "accepted_values": ["0x02", "0X2", "2"],
+        "normalization": "lowercase two-digit hex before percent mapping",
+        "zero_values": "0x00/0x00 is skipped and the next scan source is tried"
+      },
+      "read": "cat <first path>",
+      "split": "whitespace",
+      "keys": {
+        "disk_hex_1a": "values[0]",
+        "disk_hex_1b": "values[1]",
+        "disk_hex_2a": "values[2] when >= 4 values",
+        "disk_hex_2b": "values[3] when >= 4 values",
+        "disk_single_hex": "values[0] when only one value",
+        "disk_node_a": "paths[0]",
+        "disk_node_b": "paths[1]",
+        "disk_single_node": "full path when only one value",
+        "disk_health_type": "eMMC or UFS string resource"
+      }
+    },
+    "percent_mapping": {
+      "0x01": 100, "0x02": 90, "0x03": 80, "0x04": 70, "0x05": 60,
+      "0x06": 50, "0x07": 40, "0x08": 30, "0x09": 20, "0x0a": 10,
+      "0x0b": 1,
+      "display_eol": "0x0b / 0x0B renders 'EOL'",
+      "default": 0
+    },
+    "history": {
+      "keys": ["wear_history_a", "wear_history_b"],
+      "format": "[{\"t\":<epoch_millis>,\"v\":<percent>}]",
+      "initialization": "purchase date is stored as the first point (100, purchaseDate) for both groups"
+    },
+    "benchmark": {
+      "write": "100 MB in 1 MB chunks",
+      "read": "same file read back",
+      "latency": "4 KiB synced write, median/microseconds",
+      "prefs": ["benchmark_prev_write", "benchmark_prev_read", "benchmark_prev_latency"],
+      "initial_card_behavior": "previous values are shown as the current values, matching v4"
+    },
+    "backup_restore": {
+      "backup_dir": "/storage/emulated/0/Backup",
+      "legacy_dir": "/storage/emulated/0/PARTITION BACKUP",
+      "default_partitions": ["boot", "fsc", "fsg", "dtbo", "vbmeta", "modemst1", "modemst2"],
+      "restore_blocked": ["boot", "dtbo", "vbmeta", "splash", "logo"],
+      "backup_command": "su -c dd if=/dev/block/bootdevice/by-name/<part> of=<backup>/<part>.img bs=4M",
+      "restore_command": "su -c dd if=<backup>/<part>.img of=/dev/block/bootdevice/by-name/<part> bs=4M",
+      "notes": "Missing restore targets are skipped, matching v4. Restoring boot-critical images is blocked in the UI."
+    },
+    "widgets": {
+      "wear": {
+        "provider": "id.openwear.diskhealth.provider.WearLevelWidget",
+        "layout": "widget_wearlevel",
+        "info": "@xml/widget_wearlevel",
+        "action": "id.vern.wearlevelinsight.widgets.action.WEAR_REFRESH",
+        "behavior": "rescans on tap/update, renders disk type + wear level and both groups"
+      },
+      "dashboard": {
+        "provider": "id.openwear.diskhealth.provider.DashboardWidgetProvider",
+        "layout": "widget_dashboard",
+        "info": "@xml/dashboard_widget",
+        "refresh_action": "id.vern.wearlevelinsight.widgets.ACTION_REFRESH_DASHBOARD",
+        "noop_action": "id.vern.wearlevelinsight.widgets.ACTION_DO_NOTHING",
+        "behavior": "device specs + storage health; refresh button; root click is a no-op"
+      }
+    },
+    "crash": {
+      "activity": "CrashActivity",
+      "extra": "error_details",
+      "handler": "global Thread.setDefaultUncaughtExceptionHandler in Applications",
+      "actions": ["copy log", "open https://github.com/AnomalyRep/Open-Wear/issues", "close/exit"]
+    }
+  },
+  "ui_screens": {
+    "splash": {
+      "layout": "splash_screen",
+      "flow": ["agreement", "root", "permissions", "purchase date", "credits/Main"],
+      "agreement": "scroll to bottom plus countdown before Agree enables",
+      "purchase_date": "DatePickerDialog; initializes weight history"
+    },
+    "dashboard": {
+      "layout": "activity_main",
+      "toolbar": "MaterialToolbar + menu_toolbar",
+      "cards": ["dashboard", "card_wearlevel_history", "wear_level", "storage_cart", "card_io_benchmark", "card_backup_restore"],
+      "reports_dialog": "dialog_report with per-group history tables"
+    },
+    "settings": {
+      "layout": "activity_settings",
+      "preferences": "res/xml/settings.xml via PreferenceFragmentCompat",
+      "keys": ["key_theme", "key_getprefs", "key_dependency", "key_website", "key_telegram"],
+      "website": "https://github.com/AnomalyRep/Open-Wear",
+      "telegram": "display-only; Preference.isSelectable=false and no Telegram intent",
+      "credits": "ui/CreditsPreference.kt"
+    },
+    "backup_restore": {
+      "layout": "activity_backup_restore",
+      "modes": ["backup", "restore"],
+      "advanced_switch": "show all by-name partitions",
+      "selection": "checkboxes + select all",
+      "delete": "restore mode only"
+    },
+    "crash": {
+      "layout": "activity_crash",
+      "buttons": ["btnCopy", "btnReport", "btnClose"]
+    }
+  },
+  "provenance": {
+    "original_apk_shipped": false,
+    "original_code_shipped": false,
+    "repacked_apk_shipped": false,
+    "resource_layer": "decoded from the supplied v4.0.1 APK",
+    "logic_layer": "new Kotlin implementation",
+    "artwork": "bundled copies of the original device webp assets, used offline",
+    "static_only": true,
+    "authorization": "owner-supplied APK, personal/authorized reverse engineering"
+  },
+  "verification": {
+    "assembleRelease": "BUILD SUCCESSFUL",
+    "lintDebug": "BUILD SUCCESSFUL (0 errors)",
+    "apk": "OpenWear-4.0.1-release.apk (GitHub Releases asset)",
+    "apk_sha256": "1544C8C26A88895E5C3C225A8EBE619FFB7AFF9CDC939E2112493691DECA9EC8",
+    "apk_size_bytes": 14231713,
+    "apk_signature": {
+      "scheme": "v3",
+      "signer_cn": "OpenWear",
+      "certificate_sha256": "8fd9d94f32760fc5df0891b8b59a9dfa2e2a708c7de081e0cf1a44dd9b8b2dcc",
+      "keystore_committed": false
+    },
+    "manifest": {
+      "applicationId": "id.openwear.diskhealth",
+      "versionCode": 2,
+      "versionName": "4.0.1",
+      "minSdk": 29,
+      "targetSdk": 34,
+      "activities": 5,
+      "widget_receivers": 2
+    },
+    "device_runtime_test": false
+  },
+  "limitations": [
+    "No Android device or emulator was available; no on-device execution test was performed.",
+    "Root is required for eMMC/UFS sysfs, /proc/ufs_health and raw partition backup/restore. su/SELinux behavior varies by device and root manager.",
+    "UFS health attribute names and locations vary by vendor kernel; the rebuild covers DeviceLifeTimeEstA/B, SCSI health, vendor life_time*/lifetime* and /proc/ufs_health, but an exotic kernel may still need a device-specific path.",
+    "targetSdk is 34 instead of the original 36 due to the installed AGP/compile SDK; Android 15/16 behavior is untested.",
+    "Raw dd restore can brick a device; boot-critical restores are blocked but boot/fsc/fsg/modemst images are still sensitive.",
+    "The codename-to-artwork table was R8-flattened; bundled artwork covers recovered codenames with an unknown fallback.",
+    "Custom chart/gauge views approximate the original third-party rendering, not guaranteed pixel-identical.",
+    "The Settings dependency dialog intentionally lists original 4.0.1 libraries for fidelity, not the rebuild's dependencies.",
+    "LogWire diagnostics and assets/main.jar privileged payload are omitted.",
+    "No .git metadata is present in the working tree."
+  ],
+  "links": {
+    "website": "https://github.com/AnomalyRep/Open-Wear",
+    "issues": "https://github.com/AnomalyRep/Open-Wear/issues",
+    "telegram": "display-only; not clickable"
+  }
+}
