@@ -54,6 +54,15 @@ object HistoryStore {
         prefs(context).edit().putBoolean("is_purchase_date_set", true).apply()
     }
 
+    fun savePurchaseDate(context: Context, date: Long) {
+        initializePurchase(context, date)
+    }
+
+    fun getPurchaseDate(context: Context): Long {
+        val a = load(context, "wear_history_a")
+        return a.firstOrNull()?.t ?: 0L
+    }
+
     fun isPurchaseSet(context: Context): Boolean =
         prefs(context).getBoolean("is_purchase_date_set", false)
 

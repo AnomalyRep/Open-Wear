@@ -1,19 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@id/coordinator" android:background="@android:color/transparent" android:fitsSystemWindows="false" android:layout_width="match_parent" android:layout_height="match_parent"
-  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-    <include android:id="@id/toolbarlayout" layout="@layout/toolbar" />
-    <androidx.core.widget.NestedScrollView android:id="@id/nested_scroll_view" android:paddingBottom="24.0dp" android:fadingEdgeLength="96.0dp" android:layout_width="match_parent" android:layout_height="match_parent" android:requiresFadingEdge="vertical" app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-            <include android:id="@id/dashboard" layout="@layout/dashboard" />
-            <include android:id="@id/wear_chart" layout="@layout/card_wearlevel_history" />
-            <com.google.android.material.card.MaterialCardView android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="@dimen/parentMargin" android:foreground="?android:selectableItemBackground" android:elevation="@dimen/cardElevation" android:stateListAnimator="@anim/state_list_anim" android:layout_marginHorizontal="@dimen/parentMargin" app:cardBackgroundColor="?colorSurface" app:cardCornerRadius="@dimen/cardCornerRadius" app:cardMaxElevation="2.0dp" style="@style/Widget.Material3.CardView.Filled">
-                <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent">
-                    <include android:id="@id/wearlevel" layout="@layout/wear_level" />
-                    <include android:id="@id/storagecart" layout="@layout/storage_cart" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-            <include android:id="@id/card_io_benchmark" layout="@layout/card_io_benchmark" />
-            <include android:id="@id/cardbackuprestore" layout="@layout/card_backup_restore" />
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Reference v5 Transparent Top Bar -->
+        <LinearLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_toolbar"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:text="@string/app_name"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_cog"
+                app:tint="?attr/colorOnSurface"
+                android:contentDescription="@string/settings" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <!-- Scrollable Card List -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="120dp"
+            android:overScrollMode="ifContentScrolls">
+
+            <LinearLayout
+                android:id="@+id/homeList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp">
+
+                <!-- Device Card (Always at top) -->
+                <include
+                    android:id="@+id/card_device_include"
+                    layout="@layout/card_device" />
+
+                <!-- Tab 0: Wear Level & Battery -->
+                <LinearLayout
+                    android:id="@+id/container_tab_wear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/card_wear_include"
+                        layout="@layout/card_wear_level" />
+
+                    <include
+                        android:id="@+id/card_battery_include"
+                        layout="@layout/card_battery" />
+                </LinearLayout>
+
+                <!-- Tab 1: Storage & Benchmark -->
+                <LinearLayout
+                    android:id="@+id/container_tab_storage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <include
+                        android:id="@+id/card_storage_include"
+                        layout="@layout/card_storage" />
+
+                    <include
+                        android:id="@+id/card_benchmark_include"
+                        layout="@layout/card_benchmark" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+    <!-- Floating Bottom Tab Bar matching reference -->
+    <id.openwear.diskhealth.ui.view.FloatingTabBar
+        android:id="@+id/bottom_tab_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp" />
+
+</FrameLayout>

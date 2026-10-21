@@ -92,8 +92,8 @@ object Ui {
             activity.packageName + "_preferences",
             Context.MODE_PRIVATE
         )
-        val appearance = prefs.getString(activity.getString(R.string.key_appearance), "md3")
-        val background = prefs.getString(activity.getString(R.string.key_background_style), "flat")
+        val appearance = prefs.getString(activity.getString(R.string.key_appearance), "liquid")
+        val background = prefs.getString(activity.getString(R.string.key_background_style), "orbs")
         val root = activity.findViewById<View>(android.R.id.content) ?: return
         val isDark = isDark(activity)
         val liquid = appearance == "liquid"
@@ -307,21 +307,20 @@ object Ui {
         sheen: Boolean
     ) {
         val fill = when {
-            dialog && dark -> 0xB31E293B.toInt()
+            dialog && dark -> 0xD91E293B.toInt()
             dialog -> 0xF2F8FAFC.toInt()
-            dark -> 0x1AFFFFFF
-            else -> 0x47FFFFFF
+            dark -> 0x551E1A3C.toInt()
+            else -> 0x59FFFFFF.toInt()
         }
         val stroke = when {
             dialog && dark -> 0x80FFFFFF.toInt()
             dialog -> 0xCCFFFFFF.toInt()
-            dark -> 0x66FFFFFF
-            else -> 0x99FFFFFF.toInt()
+            else -> 0x00000000
         }
         val ripple = if (dark) 0x33FFFFFF else 0x1F000000
 
         card.setCardBackgroundColor(ColorStateList.valueOf(fill))
-        card.strokeWidth = dp(card.context, 1)
+        card.strokeWidth = if (dialog) dp(card.context, 1) else 0
         card.setStrokeColor(ColorStateList.valueOf(stroke))
         card.cardElevation = 0f
         card.elevation = 0f
@@ -339,7 +338,7 @@ object Ui {
             context.packageName + "_preferences",
             Context.MODE_PRIVATE
         )
-        return prefs.getString(context.getString(R.string.key_appearance), "md3") == "liquid"
+        return prefs.getString(context.getString(R.string.key_appearance), "liquid") == "liquid"
     }
 
     private fun isDark(context: Context): Boolean =

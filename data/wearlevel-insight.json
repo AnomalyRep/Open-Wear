@@ -133,7 +133,7 @@
     }
   },
   "port": {
-    "strategy": "clean-room Kotlin + XML reimplementation from static analysis",
+    "strategy": "clean-room Kotlin + Jetpack Compose reimplementation from static analysis, using androidliquidglass (com.kyant.liquidglass)",
     "application_id": "id.openwear.diskhealth",
     "namespace": "id.openwear.diskhealth",
     "version_name": "5.0.0",
@@ -392,8 +392,8 @@
     "assembleDebug": "BUILD SUCCESSFUL",
     "assembleRelease": "BUILD SUCCESSFUL",
     "apk": "OpenWear-5.0.0-release.apk (local dist folder, not published)",
-    "apk_sha256": "FC9DEA08A349856CBE9C684E66C7810C3F660A8820DAA8BD1C1AAC158E2E611C",
-    "apk_size_bytes": 14367389,
+    "apk_sha256": "44A0BE78952552DFF0583029481520089BD3A979BEF8B6273D4A3E2D5BD85841",
+    "apk_size_bytes": 28051218,
     "apk_signature": {
       "scheme": "v3",
       "signer_cn": "OpenWear",

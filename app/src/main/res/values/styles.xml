@@ -28,6 +28,8 @@
         <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
         <item name="colorTertiary">@color/colorTertiary</item>
         <item name="colorTertiaryContainer">@color/colorTertiaryContainer</item>
+        <item name="colorOutline">@color/colorOutline</item>
+        <item name="colorOutlineVariant">@color/colorOutlineVariant</item>
         <item name="preferenceTheme">@style/PreferenceFragment.Material3</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

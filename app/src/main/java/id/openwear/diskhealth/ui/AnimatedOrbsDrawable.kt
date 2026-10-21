@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.PixelFormat
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.RadialGradient
 import android.graphics.Shader
 import android.graphics.drawable.Animatable
@@ -16,22 +18,26 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * v5 Liquid Glass ambient background.
- *
- * The drawable mirrors the reference aurora mesh: a dark or light base color
- * plus the same five (dark) or four (light) radial orbs. When [animated] is
- * true the orbs drift slowly, matching the Animated Orbs background option.
+ * Animated Orb background matching reference v5.0.0 AnimatedOrbBackgroundKt.
+ * Uses the exact 4-orb orbital trajectories, 4-stop radial gradient falloffs,
+ * screen blending, and vivid cyber-glass palette (cyan, purple, magenta, electric blue).
  */
 class AnimatedOrbsDrawable(
-    private val dark: Boolean = false,
+    private val dark: Boolean = true,
     private val animated: Boolean = true
 ) : Drawable(), Animatable {
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val basePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val orbPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        if (dark) {
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.SCREEN)
+        }
+    }
+
     private var phase = 0f
 
     private val animator = ValueAnimator.ofFloat(0f, 1f).apply {
-        duration = 24_000
+        duration = 16_000
         repeatCount = ValueAnimator.INFINITE
         interpolator = LinearInterpolator()
         addUpdateListener {
@@ -40,82 +46,91 @@ class AnimatedOrbsDrawable(
         }
     }
 
-    private data class Orb(
-        val x: Float,
-        val y: Float,
-        val radius: Float,
-        val color: Int
-    )
-
-    private val orbs: List<Orb> = if (animated) {
-        // v5 drawAuroraMesh: five dark orbs, four light orbs.
-        if (dark) {
-            listOf(
-                Orb(0.85f, 0.10f, 0.90f, Color.argb(133, 0x1D, 0x4E, 0xD8)),
-                Orb(0.08f, 0.40f, 0.85f, Color.argb(115, 0x7C, 0x3A, 0xED)),
-                Orb(0.92f, 0.62f, 0.80f, Color.argb(97, 0x43, 0x38, 0xCA)),
-                Orb(0.25f, 0.88f, 0.85f, Color.argb(102, 0x02, 0x84, 0xC7)),
-                Orb(0.85f, 0.95f, 0.70f, Color.argb(71, 0xBE, 0x18, 0x5D))
-            )
-        } else {
-            listOf(
-                Orb(0.85f, 0.10f, 0.90f, Color.argb(115, 0x38, 0xBD, 0xF8)),
-                Orb(0.08f, 0.40f, 0.85f, Color.argb(102, 0xA7, 0x8B, 0xFA)),
-                Orb(0.92f, 0.62f, 0.80f, Color.argb(77, 0xF4, 0x72, 0xB6)),
-                Orb(0.25f, 0.88f, 0.85f, Color.argb(89, 0x2D, 0xD4, 0xBF))
-            )
-        }
-    } else {
-        // v5 drawLiquidGlassAmbientBackground: three softer orbs.
-        if (dark) {
-            listOf(
-                Orb(0.85f, 0.15f, 0.85f, Color.argb(71, 0x38, 0xBD, 0xF8)),
-                Orb(0.15f, 0.55f, 0.75f, Color.argb(56, 0x81, 0x8C, 0xF8)),
-                Orb(0.80f, 0.85f, 0.70f, Color.argb(46, 0xF4, 0x72, 0xB6))
-            )
-        } else {
-            listOf(
-                Orb(0.85f, 0.12f, 0.85f, Color.argb(102, 0xBA, 0xE6, 0xFD)),
-                Orb(0.15f, 0.50f, 0.75f, Color.argb(82, 0xDD, 0xD6, 0xFE)),
-                Orb(0.80f, 0.85f, 0.70f, Color.argb(64, 0xFE, 0xD7, 0xAA))
-            )
-        }
-    }
+    // Exact palette from reference AnimatedOrbBackgroundKt.rememberRandomOrbPalette
+    private val orb1Color = 0xFF00EDFF.toInt() // Vibrant Cyan
+    private val orb2Color = 0xFF9C27B0.toInt() // Deep Violet / Purple
+    private val orb3Color = 0xFFFF007F.toInt() // Magenta / Rose
+    private val orb4Color = 0xFF3D5AFE.toInt() // Electric Indigo / Blue
 
     override fun draw(canvas: Canvas) {
         val w = bounds.width().toFloat()
         val h = bounds.height().toFloat()
         if (w <= 0f || h <= 0f) return
 
-        paint.shader = null
-        paint.color = if (dark) 0xFF070B14.toInt() else 0xFFF1F5F9.toInt()
-        canvas.drawRect(bounds, paint)
+        // Base background matching reference Color(isDark ? 0xFF070B14 : 0xFFF1F5F9)
+        basePaint.shader = null
+        basePaint.color = if (dark) 0xFF070B14.toInt() else 0xFFF1F5F9.toInt()
+        canvas.drawRect(bounds, basePaint)
 
         val tau = (PI * 2.0).toFloat()
-        orbs.forEachIndexed { index, orb ->
-            val drift = if (animated) phase * tau + index * 1.1f else 0f
-            val cx = w * orb.x + if (animated) sin(drift) * w * 0.035f else 0f
-            val cy = h * orb.y + if (animated) cos(drift * 0.9f) * h * 0.025f else 0f
-            paint.shader = RadialGradient(
-                cx,
-                cy,
-                w * orb.radius,
-                intArrayOf(orb.color, Color.TRANSPARENT),
-                floatArrayOf(0f, 1f),
-                Shader.TileMode.CLAMP
-            )
-            canvas.drawCircle(cx, cy, w * orb.radius, paint)
-        }
-        paint.shader = null
+        val p = if (animated) phase * tau else 0f
+
+        // Pulse scale: 0.95f to 1.20f matching reference AnimatedOrbState
+        val pulse = 1.0f + 0.12f * sin(p * 2f)
+
+        // Orb 1: Cyan (top-left to center drift)
+        val o1x = w * (0.25f + 0.30f * sin(p * 0.8f))
+        val o1y = h * (0.25f + 0.20f * cos(p * 0.7f))
+        val r1 = 1.10f * w * pulse
+        drawGradientOrb(canvas, o1x, o1y, r1, orb1Color, 0.55f, 0.25f, 0.08f)
+
+        // Orb 2: Purple (bottom-right to center drift)
+        val o2x = w * (0.75f - 0.35f * sin(p * 0.65f))
+        val o2y = h * (0.65f - 0.30f * cos(p * 0.75f))
+        val r2 = 1.15f * w * pulse
+        drawGradientOrb(canvas, o2x, o2y, r2, orb2Color, 0.50f, 0.20f, 0.06f)
+
+        // Orb 3: Magenta (bottom horizontal wave)
+        val o3x = w * (0.45f + 0.40f * cos(p * 0.6f))
+        val o3y = h * (0.80f + 0.10f * sin(p * 0.9f))
+        val r3 = 1.05f * w * pulse
+        drawGradientOrb(canvas, o3x, o3y, r3, orb3Color, 0.45f, 0.18f, 0.05f)
+
+        // Orb 4: Electric Blue (center-left orbit)
+        val o4x = w * (0.35f - 0.20f * sin(p * 0.85f))
+        val o4y = h * (0.50f + 0.25f * cos(p * 0.8f))
+        val r4 = 1.00f * w * pulse
+        drawGradientOrb(canvas, o4x, o4y, r4, orb4Color, 0.42f, 0.16f, 0.04f)
+    }
+
+    private fun drawGradientOrb(
+        canvas: Canvas,
+        cx: Float,
+        cy: Float,
+        radius: Float,
+        color: Int,
+        alpha0: Float,
+        alpha1: Float,
+        alpha2: Float
+    ) {
+        val r = (color shr 16) and 0xFF
+        val g = (color shr 8) and 0xFF
+        val b = color and 0xFF
+
+        val c0 = Color.argb((alpha0 * 255).toInt(), r, g, b)
+        val c1 = Color.argb((alpha1 * 255).toInt(), r, g, b)
+        val c2 = Color.argb((alpha2 * 255).toInt(), r, g, b)
+        val c3 = Color.TRANSPARENT
+
+        orbPaint.shader = RadialGradient(
+            cx, cy, radius,
+            intArrayOf(c0, c1, c2, c3),
+            floatArrayOf(0f, 0.40f, 0.75f, 1f),
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawCircle(cx, cy, radius, orbPaint)
+        orbPaint.shader = null
     }
 
     override fun setAlpha(alpha: Int) {
-        paint.alpha = alpha
+        basePaint.alpha = alpha
+        orbPaint.alpha = alpha
         invalidateSelf()
     }
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
-        paint.colorFilter = colorFilter
+        basePaint.colorFilter = colorFilter
+        orbPaint.colorFilter = colorFilter
         invalidateSelf()
     }
 

@@ -261,7 +261,7 @@ Both parameters are important measures for devices that use UFS technology as th
   <string name="active_slot">Active System Slot</string>
   <string name="agree">Yes, I Agree</string>
   <string name="androidx_startup">androidx.startup</string>
-  <string name="app_name">Wear Level Insight</string>
+  <string name="app_name">OpenWear</string>
   <string name="appearances">Appearances</string>
   <string name="are_you_sure_you_want_to_delet">Are you sure you want to delete</string>
   <string name="are_you_sure_you_want_to_exit">Are you sure you want to exit?</string>
@@ -492,7 +492,7 @@ Version Number: %2$s"</string>
     <!-- OpenWear v5.0.0 -->
     <string name="access_mode">Access Mode</string>
     <string name="access_mode_summary">Select the access method used to query hardware and storage wear</string>
-    <string name="access_mode_wizard_desc">Choose how OpenWear reads device hardware and storage descriptors:</string>
+    <string name="access_mode_wizard_desc">Choose how OpenWear communicates with your device hardware and storage descriptors:</string>
     <string name="access_mode_root">Root</string>
     <string name="access_mode_root_desc">Use su for restricted sysfs nodes and raw partition backup. Full feature set.</string>
     <string name="access_mode_non_root">Non-root</string>
@@ -579,4 +579,37 @@ Version Number: %2$s"</string>
     <string name="key_check_updates">key_check_updates</string>
     <string name="section_general">General</string>
     <string name="section_hardware">Hardware</string>
+    <string name="tab_wear_benchmark">Wear Level</string>
+    <string name="tab_storage_backup">Storage</string>
+    <string name="need_root_access">Need root access</string>
+    <string name="root_mode">Root Mode</string>
+    <string name="non_root_mode">Non-Root Mode</string>
+    <string name="continue_with_mode">Continue with %1$s</string>
+    <string name="reading_device_storage">Reading device storage...</string>
+    <string name="contributors_summary">People who contributed to this project</string>
+    <string name="purchase_date">Purchase Date</string>
+    <string name="purchase_date_summary">Device purchase date for lifetime estimations</string>
+    <string name="mode_root_desc">Full kernel sysfs access &amp; raw partition backup via SuperSU/Magisk/KernelSU</string>
+    <string name="mode_non_root_desc">Standalone reading of public 0444 kernel nodes and standard battery API</string>
+    <string name="battery_info">Battery</string>
+    <string name="random_access">Random Access (4K)</string>
+    <string name="external_storage">External Storage</string>
+    <string name="not_mounted">Not Mounted</string>
+    <string name="root_status_granted">Root access granted</string>
+    <string name="root_status_checking">Checking root access...</string>
+    <string name="root_status_denied">Root access not granted</string>
+    <string name="grant_permissions">Grant Permissions</string>
+    <string name="notification_permission">Notification Permission</string>
+    <string name="storage_permission">Storage Permission</string>
+    <string name="score">Score</string>
+    <string name="settings">Settings</string>
+    <string name="benchmark">Benchmark</string>
+    <string name="write_speed">Write Speed</string>
+    <string name="read_speed">Read Speed</string>
+    <string name="backup_and_restore">Backup &amp; Restore</string>
+    <string name="history">History</string>
+    <string name="skip">Skip for now</string>
+    <string name="battery_health_info_title">Battery Health Calculation</string>
+    <string name="app_info">App Info</string>
+    <string name="backup_restore_summary">Backup and restore partition blocks</string>
 </resources>

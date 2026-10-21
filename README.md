@@ -1,8 +1,8 @@
-# OpenWear - Wear Level Insight v5.0.0 Kotlin/XML port
+# OpenWear - Wear Level Insight v5.0.0 Jetpack Compose & Liquid Glass Port
 
-OpenWear is a clean-room Kotlin + XML reconstruction of **Wear Level Insight
+OpenWear is a clean-room Kotlin + Jetpack Compose reconstruction of **Wear Level Insight
 5.0.0** (`id.vern.wearlevelinsight`), built from static analysis of the APK
-supplied by the project owner.
+supplied by the project owner and powered by `androidliquidglass` (`com.kyant.liquidglass`).
 
 Repository: <https://github.com/AnomalyRep/Open-Wear>
 
@@ -87,8 +87,8 @@ Built and signed locally. This file has not been uploaded to GitHub.
 | File | `dist/OpenWear-5.0.0-release.apk` |
 | Package | `id.openwear.diskhealth` |
 | Version | 5.0.0 (versionCode 5) |
-| Size | 14,367,389 bytes |
-| SHA-256 | `FC9DEA08A349856CBE9C684E66C7810C3F660A8820DAA8BD1C1AAC158E2E611C` |
+| Size | 28,051,218 bytes |
+| SHA-256 | `44A0BE78952552DFF0583029481520089BD3A979BEF8B6273D4A3E2D5BD85841` |
 | Signature | APK Signature Scheme v3 |
 | Certificate SHA-256 | `8fd9d94f32760fc5df0891b8b59a9dfa2e2a708c7de081e0cf1a44dd9b8b2dcc` |
 | Certificate DN | `CN=OpenWear, OU=OpenWear, O=OpenWear, L=Unknown, ST=Unknown, C=ID` |
@@ -104,14 +104,33 @@ size 14,231,713 bytes, SHA-256
 
 ## Implemented screens and behavior
 
-* **Splash / onboarding** - agreement countdown and scroll gate, access-mode
-  choice, root check when Root is selected, all-files / unknown-sources /
-  notification permissions, purchase-date picker, credits page, then dashboard
-  hand-off.
-* **Dashboard** - device panel (`Build`, `/proc`, GPU sysfs, `StatFs`,
-  charge-full and `PowerProfile`), battery health row and detail dialog,
-  storage card with pie diagram, dynamic wear rows A/B/Pre-EOL/spares, history
-  chart, I/O benchmark, reports table, recent-backup list.
+* **Splash / onboarding** - 5-step card wizard matching reference v5 (Welcome
+  with large icon, Access Mode with interactive Root/Non-root cards and live root
+  verification, Permissions, Purchase Date with date picker and skip option, and
+  Loading screen with rotating indicator and storage reading message).
+* **Home dashboard** - transparent 64dp top bar with 28dp app icon, app title,
+  and settings button. Scrollable cards with Device Card (model name, access mode
+  chip, 76x124 device artwork, and full hardware specs) always visible at top.
+* **Floating bottom tab bar** - bottom-center 52dp pill tab bar matching reference
+  FloatingTabBar, switching between Wear Level (`ic_disk_health`) and Storage
+  (`ic_storage`) tabs with smooth indicator animation and bold labels.
+* **Wear Level tab** - Wear Level card with disk type header, refresh/history
+  action, and circular ring gauges with hex and percent text (or root required
+  notice). Battery Card with 44x78 custom battery glyph, dynamic level fill,
+  charging bolt indicator, real-time metrics (health, design capacity, estimated
+  capacity, voltage, cycle count, kernel power profile, charger status, power),
+  and battery health calculation dialog.
+* **Storage tab** - Storage card with dual 76dp donut charts for internal and
+  removable external storage with used and free legends, partition backup
+  shortcut, and Benchmark card with 110dp score gauge and speed metrics.
+* **Settings** - custom scrollable card list replacing PreferenceFragment,
+  matching reference sections (Appearances, Access Mode, Backup & Restore for root,
+  Preferences and Dependencies with purchase date, battery capacity, saved
+  preferences, dependencies, contributors, and More with GitHub source, update
+  check, display-only Telegram row, and App Info).
+* **Liquid Glass** - specular rim gradients, subtle translucent fills, and
+  specular sheen matching reference Compose tokens across all cards, dialogs,
+  and floating tab bar.
 * **Wear scan** - eMMC plus modern and vendor UFS. Root mode uses `su`; non-root
   mode uses the public shell and world-readable sysfs nodes.
 
