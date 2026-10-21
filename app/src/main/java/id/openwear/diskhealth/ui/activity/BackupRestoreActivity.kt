@@ -17,6 +17,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import id.openwear.diskhealth.R
+import id.openwear.diskhealth.data.AccessMode
 import id.openwear.diskhealth.data.BackupManager
 import id.openwear.diskhealth.data.PartitionItem
 import id.openwear.diskhealth.data.Shell
@@ -51,11 +52,30 @@ class BackupRestoreActivity : AppCompatActivity() {
     private var restoreItems: List<PartitionItem> = emptyList()
     private var mode = MODE_BACKUP
 
+    override fun onDestroy() {
+        Ui.stopAppearance(this)
+        super.onDestroy()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Ui.applyTheme(this)
         setContentView(R.layout.activity_backup_restore)
         Ui.edgeToEdge(this)
+        Ui.applyAppearance(this)
+
+        if (AccessMode.current(this) != AccessMode.ROOT) {
+            Ui.dialog(
+                this,
+                getString(R.string.access_mode),
+                getString(R.string.access_mode_requires_root),
+                positive = getString(R.string.close),
+                root = findViewById(android.R.id.content),
+                onPositive = { finish() },
+                cancelable = false
+            )
+            return
+        }
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)

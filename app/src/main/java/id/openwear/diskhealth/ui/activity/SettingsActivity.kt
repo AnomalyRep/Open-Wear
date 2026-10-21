@@ -19,9 +19,16 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
+import id.openwear.diskhealth.BuildConfig
 import id.openwear.diskhealth.R
+import id.openwear.diskhealth.data.AccessMode
+import id.openwear.diskhealth.data.BatteryInfoReader
+import id.openwear.diskhealth.data.Shell
 import id.openwear.diskhealth.ui.DialogFactory
 import id.openwear.diskhealth.ui.Ui
+import java.net.HttpURLConnection
+import java.net.URL
 
 /**
  * Settings screen, ported from v4.0.1 `SettingsActivity` + `o1.c`.
@@ -37,12 +44,18 @@ class SettingsActivity : AppCompatActivity() {
         Ui.applyTheme(this)
         setContentView(R.layout.activity_settings)
         Ui.edgeToEdge(this)
+        Ui.applyAppearance(this)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, SettingsFragment())
                 .commit()
         }
+    }
+
+    override fun onDestroy() {
+        Ui.stopAppearance(this)
+        super.onDestroy()
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
@@ -53,6 +66,12 @@ class SettingsActivity : AppCompatActivity() {
                 Context.MODE_PRIVATE
             )
 
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            view.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            listView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        }
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.settings, rootKey)
 
@@ -61,6 +80,39 @@ class SettingsActivity : AppCompatActivity() {
             themePref?.summary = currentTheme()
             themePref?.setOnPreferenceClickListener {
                 showThemeDialog()
+                true
+            }
+
+            findPreference<Preference>(getString(R.string.key_access_mode))?.apply {
+                summary = getString(AccessMode.current(requireContext()).titleRes)
+                setOnPreferenceClickListener {
+                    showAccessModeDialog()
+                    true
+                }
+            }
+            findPreference<Preference>(getString(R.string.key_battery_capacity))?.apply {
+                updateBatterySummary(this)
+                setOnPreferenceClickListener {
+                    showBatteryCapacityDialog()
+                    true
+                }
+            }
+            findPreference<Preference>(getString(R.string.key_appearance))?.apply {
+                summary = appearanceLabel()
+                setOnPreferenceClickListener {
+                    showAppearanceDialog()
+                    true
+                }
+            }
+            findPreference<Preference>(getString(R.string.key_background_style))?.apply {
+                summary = backgroundLabel()
+                setOnPreferenceClickListener {
+                    showBackgroundDialog()
+                    true
+                }
+            }
+            findPreference<Preference>(getString(R.string.key_check_updates))?.setOnPreferenceClickListener {
+                checkForUpdates()
                 true
             }
 
@@ -135,6 +187,210 @@ class SettingsActivity : AppCompatActivity() {
             AppCompatDelegate.setDefaultNightMode(mode)
         }
 
+        private fun showAccessModeDialog() {
+            val context = requireContext()
+            val root = requireActivity().findViewById<View>(android.R.id.content)
+            val current = AccessMode.current(context)
+            val labels = listOf(
+                getString(R.string.access_mode_root),
+                getString(R.string.access_mode_non_root)
+            )
+            var dialogRef: android.app.Dialog? = null
+            val dialog = Ui.listDialog(
+                context,
+                getString(R.string.access_mode),
+                labels,
+                root
+            ) { position ->
+                dialogRef?.dismiss()
+                if (position == 0) {
+                    Thread {
+                        val rooted = Shell.isRooted(force = true)
+                        Handler(Looper.getMainLooper()).post {
+                            if (!isAdded) return@post
+                            if (rooted) {
+                                setAccessMode(AccessMode.ROOT)
+                            } else {
+                                setAccessMode(AccessMode.NON_ROOT)
+                                Ui.dialog(
+                                    context,
+                                    getString(R.string.access_mode),
+                                    getString(R.string.access_mode_root_denied),
+                                    positive = getString(R.string.close),
+                                    root = root
+                                )
+                            }
+                        }
+                    }.start()
+                } else {
+                    setAccessMode(AccessMode.NON_ROOT)
+                }
+            }
+            dialogRef = dialog
+            // Show the current selection as a small subtitle in the title.
+            if (current == AccessMode.ROOT) {
+                dialog.findViewById<TextView>(R.id.dialogTitle)?.text =
+                    getString(R.string.access_mode) + "  (" + getString(R.string.access_mode_root) + ")"
+            }
+        }
+
+        private fun setAccessMode(mode: AccessMode) {
+            AccessMode.set(requireContext(), mode)
+            findPreference<Preference>(getString(R.string.key_access_mode))?.summary =
+                getString(mode.titleRes)
+            Ui.toast(requireContext(), getString(R.string.access_mode_changed))
+        }
+
+        private fun updateBatterySummary(preference: Preference) {
+            val custom = BatteryInfoReader.customCapacity(requireContext())
+            preference.summary = if (custom > 0) {
+                "$custom mAh"
+            } else {
+                getString(R.string.system_default)
+            }
+        }
+
+        private fun showBatteryCapacityDialog() {
+            val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_input, null)
+            val input = view.findViewById<TextInputEditText>(R.id.inputCapacity)
+            val layout = view.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.inputLayout)
+            view.findViewById<TextView>(R.id.dialogTitle).text = getString(R.string.edit_battery_capacity)
+            layout.hint = getString(R.string.battery_capacity_hint)
+            view.findViewById<TextView>(R.id.inputHint).text = getString(R.string.battery_health_calc_desc)
+            val custom = BatteryInfoReader.customCapacity(requireContext())
+            if (custom > 0) input.setText(custom.toString())
+
+            val dialog = DialogFactory.create(requireActivity(), view)
+            val negative = view.findViewById<MaterialButton>(R.id.negativeButton)
+            val positive = view.findViewById<MaterialButton>(R.id.positiveButton)
+            negative.setText(R.string.reset_battery_capacity)
+            positive.setText(R.string.save)
+            negative.setOnClickListener {
+                BatteryInfoReader.setCustomCapacity(requireContext(), 0)
+                findPreference<Preference>(getString(R.string.key_battery_capacity))?.let {
+                    updateBatterySummary(it)
+                }
+                dialog.dismiss()
+            }
+            positive.setOnClickListener {
+                val value = input.text?.toString()?.trim()?.toIntOrNull()
+                if (value == null || value !in 100..30_000) {
+                    layout.error = "100 - 30000 mAh"
+                    return@setOnClickListener
+                }
+                BatteryInfoReader.setCustomCapacity(requireContext(), value)
+                findPreference<Preference>(getString(R.string.key_battery_capacity))?.let {
+                    updateBatterySummary(it)
+                }
+                Ui.toast(requireContext(), getString(R.string.battery_capacity_saved))
+                dialog.dismiss()
+            }
+            dialog.show()
+        }
+
+        private fun appearanceLabel(): String = when (prefs().getString(getString(R.string.key_appearance), "md3")) {
+            "liquid" -> getString(R.string.appearance_liquid_glass)
+            else -> getString(R.string.appearance_md3_expressive)
+        }
+
+        private fun backgroundLabel(): String = when (prefs().getString(getString(R.string.key_background_style), "flat")) {
+            "orbs" -> getString(R.string.background_orbs)
+            else -> getString(R.string.background_flat)
+        }
+
+        private fun showAppearanceDialog() {
+            showChoice(
+                getString(R.string.title_appearance),
+                listOf(
+                    "md3" to getString(R.string.appearance_md3_expressive),
+                    "liquid" to getString(R.string.appearance_liquid_glass)
+                )
+            ) { value ->
+                prefs().edit().putString(getString(R.string.key_appearance), value).apply()
+                findPreference<Preference>(getString(R.string.key_appearance))?.summary = appearanceLabel()
+                Ui.applyAppearance(requireActivity())
+            }
+        }
+
+        private fun showBackgroundDialog() {
+            showChoice(
+                getString(R.string.title_background_style),
+                listOf(
+                    "flat" to getString(R.string.background_flat),
+                    "orbs" to getString(R.string.background_orbs)
+                )
+            ) { value ->
+                prefs().edit().putString(getString(R.string.key_background_style), value).apply()
+                findPreference<Preference>(getString(R.string.key_background_style))?.summary = backgroundLabel()
+                Ui.applyAppearance(requireActivity())
+            }
+        }
+
+        private fun showChoice(title: String, values: List<Pair<String, String>>, onSelect: (String) -> Unit) {
+            val root = requireActivity().findViewById<View>(android.R.id.content)
+            var dialog: android.app.Dialog? = null
+            dialog = Ui.listDialog(
+                requireContext(),
+                title,
+                values.map { it.second },
+                root
+            ) { position ->
+                dialog?.dismiss()
+                onSelect(values.getOrElse(position) { values.first() }.first)
+            }
+        }
+
+        private fun checkForUpdates() {
+            val context = requireContext()
+            val root = requireActivity().findViewById<View>(android.R.id.content)
+            Thread {
+                val latest = fetchLatestTag()
+                Handler(Looper.getMainLooper()).post {
+                    if (!isAdded) return@post
+                    when {
+                        latest == null -> Ui.dialog(
+                            context,
+                            getString(R.string.check_updates),
+                            getString(R.string.update_error),
+                            positive = getString(R.string.close),
+                            root = root
+                        )
+                        latest.trimStart('v', 'V') == BuildConfig.VERSION_NAME -> Ui.dialog(
+                            context,
+                            getString(R.string.check_updates),
+                            getString(R.string.update_latest) + "\n\nv" + BuildConfig.VERSION_NAME,
+                            positive = getString(R.string.close),
+                            root = root
+                        )
+                        else -> Ui.dialog(
+                            context,
+                            getString(R.string.check_updates),
+                            getString(R.string.update_available) + "\n\n" + latest,
+                            positive = getString(R.string.github_source),
+                            negative = getString(R.string.close),
+                            root = root,
+                            onPositive = { openUrl(GITHUB_RELEASES_URL) }
+                        )
+                    }
+                }
+            }.start()
+        }
+
+        private fun fetchLatestTag(): String? = runCatching {
+            val connection = URL(GITHUB_API_LATEST).openConnection() as HttpURLConnection
+            connection.connectTimeout = 8_000
+            connection.readTimeout = 8_000
+            connection.setRequestProperty("Accept", "application/vnd.github+json")
+            connection.setRequestProperty("User-Agent", "OpenWear")
+            try {
+                if (connection.responseCode !in 200..299) return@runCatching null
+                val text = connection.inputStream.bufferedReader().readText()
+                Regex("\"tag_name\"\\s*:\\s*\"([^\"]+)\"").find(text)?.groupValues?.get(1)
+            } finally {
+                connection.disconnect()
+            }
+        }.getOrNull()
+
         private fun showSavedPreferences() {
             val items = prefs().all.entries.map { (key, value) -> "$key: $value" }
                 .ifEmpty { listOf(getString(R.string.saved_preferences)) }
@@ -182,6 +438,9 @@ class SettingsActivity : AppCompatActivity() {
 
         private companion object {
             const val GITHUB_URL = "https://github.com/AnomalyRep/Open-Wear"
+            const val GITHUB_RELEASES_URL = "https://github.com/AnomalyRep/Open-Wear/releases"
+            const val GITHUB_API_LATEST =
+                "https://api.github.com/repos/AnomalyRep/Open-Wear/releases/latest"
 
             /** Copied verbatim from the v4.0.1 dependency preference. */
             const val DEPENDENCIES =

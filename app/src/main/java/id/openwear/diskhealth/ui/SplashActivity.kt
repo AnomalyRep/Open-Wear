@@ -1,13 +1,13 @@
 package id.openwear.diskhealth.ui
 
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
-import android.os.Process
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import id.openwear.diskhealth.R
+import id.openwear.diskhealth.data.AccessMode
 import id.openwear.diskhealth.data.HistoryStore
 import id.openwear.diskhealth.data.Shell
 import id.openwear.diskhealth.ui.activity.MainActivity
@@ -27,15 +28,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
 import java.util.Calendar
 
 /**
- * Onboarding flow from v4.0.1:
- * welcome -> root -> permissions -> purchase date -> dashboard.
- * When the purchase date is already known it jumps to the credits page and
- * shows the dashboard after two seconds.
+ * Onboarding flow:
+ * welcome -> access mode -> root (optional) -> permissions -> purchase date
+ * -> dashboard. When the purchase date is already known it jumps to the
+ * credits page, resolves a missing access mode, and shows the dashboard.
  */
 class SplashActivity : AppCompatActivity() {
 
@@ -47,6 +47,7 @@ class SplashActivity : AppCompatActivity() {
         Ui.applyTheme(this)
         setContentView(R.layout.splash_screen)
         Ui.edgeToEdge(this)
+        Ui.applyAppearance(this)
         flipper = findViewById(R.id.viewFlipper)
         rootView = findViewById(android.R.id.content)
 
@@ -65,6 +66,14 @@ class SplashActivity : AppCompatActivity() {
             flipper.displayedChild = 4
             lifecycleScope.launch {
                 delay(2000)
+                // Existing v4 users may already have a purchase date but no
+                // access-mode preference yet. Resolve it off the main thread.
+                if (!prefs().contains(AccessMode.KEY)) {
+                    val mode = withContext(Dispatchers.IO) {
+                        if (Shell.isRooted()) AccessMode.ROOT else AccessMode.NON_ROOT
+                    }
+                    AccessMode.set(this@SplashActivity, mode)
+                }
                 openMain()
             }
         } else {
@@ -74,23 +83,32 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun bindOnboarding() {
-        findViewById<MaterialButton>(R.id.btn_start).setOnClickListener { flipper.showNext() }
+        findViewById<MaterialButton>(R.id.btn_start).setOnClickListener {
+            if (prefs().contains(AccessMode.KEY)) {
+                proceedWithAccessMode(AccessMode.current(this))
+            } else {
+                showAccessModeDialog()
+            }
+        }
 
         findViewById<MaterialButton>(R.id.btn_grant_root).setOnClickListener {
             lifecycleScope.launch {
-                val root = withContext(Dispatchers.IO) { hasRoot() }
+                val root = withContext(Dispatchers.IO) { Shell.isRooted(force = true) }
                 if (root) {
                     if (flipper.displayedChild == 1) flipper.showNext()
                 } else {
                     Ui.dialog(
                         this@SplashActivity,
                         getString(R.string.request_root_access),
-                        getString(R.string.root_access_denied_this_app_ca),
-                        positive = "Retry",
-                        negative = getString(R.string.exit),
+                        getString(R.string.access_mode_root_denied),
+                        positive = getString(R.string.retry),
+                        negative = getString(R.string.access_mode_non_root),
                         root = rootView,
                         onPositive = { flipper.displayedChild = 1 },
-                        onNegative = { finishAffinity() },
+                        onNegative = {
+                            AccessMode.set(this@SplashActivity, AccessMode.NON_ROOT)
+                            flipper.displayedChild = 2
+                        },
                         cancelable = false
                     )
                 }
@@ -108,12 +126,27 @@ class SplashActivity : AppCompatActivity() {
         findViewById<MaterialButton>(R.id.btn_select_date).setOnClickListener { showDatePicker() }
     }
 
-    private fun hasRoot(): Boolean {
-        if (Process.myUid() == 0) return true
-        val path = System.getenv("PATH").orEmpty()
-        return Shell.suBinary() != null || path.split(":").any { dir ->
-            dir.isNotBlank() && File(dir, "su").canExecute()
+    private fun showAccessModeDialog() {
+        val items = listOf(
+            getString(R.string.access_mode_root),
+            getString(R.string.access_mode_non_root)
+        )
+        var dialog: Dialog? = null
+        dialog = Ui.listDialog(
+            this,
+            getString(R.string.access_mode),
+            items,
+            rootView
+        ) { position ->
+            dialog?.dismiss()
+            val mode = if (position == 0) AccessMode.ROOT else AccessMode.NON_ROOT
+            AccessMode.set(this, mode)
+            proceedWithAccessMode(mode)
         }
+    }
+
+    private fun proceedWithAccessMode(mode: AccessMode) {
+        flipper.displayedChild = if (mode == AccessMode.ROOT) 1 else 2
     }
 
     private fun hasAllPermissions(): Boolean {
@@ -191,6 +224,11 @@ class SplashActivity : AppCompatActivity() {
     private fun openMain() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    override fun onDestroy() {
+        Ui.stopAppearance(this)
+        super.onDestroy()
     }
 
     private fun showAgreement() {

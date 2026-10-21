@@ -87,6 +87,10 @@ object Shell {
         }
     }
 
+    /** Runs a command through the normal app shell, never through su. */
+    fun runUser(command: String, timeoutSeconds: Long = 20): Result =
+        runWith("sh", command, timeoutSeconds, rooted = false)
+
     fun run(command: String, timeoutSeconds: Long = 20): Result {
         val su = suBinary()
         if (su != null) {

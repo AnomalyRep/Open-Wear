@@ -22,11 +22,17 @@ import id.openwear.diskhealth.ui.Ui
  */
 class CrashActivity : AppCompatActivity() {
 
+    override fun onDestroy() {
+        Ui.stopAppearance(this)
+        super.onDestroy()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Ui.applyTheme(this)
         setContentView(R.layout.activity_crash)
         Ui.edgeToEdge(this)
+        Ui.applyAppearance(this)
 
         val details = intent.getStringExtra("error_details") ?: "Unknown Error"
         findViewById<TextView>(R.id.tv_error_log).text = details

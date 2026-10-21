@@ -57,6 +57,46 @@ object Ui {
         AppCompatDelegate.setDefaultNightMode(mode)
     }
 
+    /** Applies the v5 appearance/background choice to an activity root. */
+    fun applyAppearance(activity: Activity) {
+        val prefs = activity.getSharedPreferences(
+            activity.packageName + "_preferences",
+            Context.MODE_PRIVATE
+        )
+        val appearance = prefs.getString(activity.getString(R.string.key_appearance), "md3")
+        val background = prefs.getString(activity.getString(R.string.key_background_style), "flat")
+        val root = activity.findViewById<View>(android.R.id.content) ?: return
+        (root.background as? android.graphics.drawable.Animatable)?.stop()
+        when {
+            background == "orbs" -> {
+                root.background = AnimatedOrbsDrawable().also { it.start() }
+            }
+            appearance == "liquid" -> root.setBackgroundResource(R.drawable.bg_liquid_glass)
+            else -> {
+                val value = android.util.TypedValue()
+                if (activity.theme.resolveAttribute(
+                        com.google.android.material.R.attr.colorSurfaceVariant,
+                        value,
+                        true
+                    )
+                ) {
+                    val color = if (value.resourceId != 0) {
+                        androidx.core.content.ContextCompat.getColor(activity, value.resourceId)
+                    } else {
+                        value.data
+                    }
+                    root.setBackgroundColor(color)
+                }
+            }
+        }
+    }
+
+    /** Stops an animated background before the activity is destroyed. */
+    fun stopAppearance(activity: Activity) {
+        val root = activity.findViewById<View>(android.R.id.content) ?: return
+        (root.background as? android.graphics.drawable.Animatable)?.stop()
+    }
+
     fun toast(context: Context, message: String) {
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(context.applicationContext, message, Toast.LENGTH_LONG).show()

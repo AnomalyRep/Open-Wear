@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/widget_root" android:background="@drawable/rounded_background" android:padding="8.0dp" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ImageView android:id="@id/deviceimage" android:layout_width="0.0dp" android:layout_height="match_parent" android:scaleType="fitCenter" android:layout_weight="2.0" android:layout_marginEnd="8.0dp" android:paddingVertical="2.0dp" />
+    <LinearLayout android:gravity="center_vertical" android:orientation="vertical" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="8.0">
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <ImageView android:id="@id/btn_refresh" android:background="?android:selectableItemBackgroundBorderless" android:padding="2.0dp" android:layout_width="20.0dp" android:layout_height="20.0dp" android:src="@drawable/ic_refresh" android:layout_alignParentTop="true" android:layout_alignParentEnd="true" app:tint="@color/colorPrimary" />
+            <TextView android:textAppearance="@style/TextAppearanceTitle" android:textStyle="bold" android:textColor="@color/colorPrimary" android:ellipsize="marquee" android:id="@id/tvDevice" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Device Name" android:singleLine="true" android:layout_centerVertical="true" android:layout_toStartOf="@id/btn_refresh" />
+        </RelativeLayout>
+        <TextView android:textAppearance="@style/TextAppearanceBody" android:ellipsize="end" android:id="@id/tvBatteryCapacity" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Battery" android:singleLine="true" android:drawablePadding="4.0dp" android:drawableStart="@drawable/ic_battery" />
+        <TextView android:textAppearance="@style/TextAppearanceBody" android:ellipsize="end" android:id="@id/tvWearLevel" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Wear Level" android:singleLine="true" android:drawablePadding="4.0dp" android:drawableStart="@drawable/ic_cycle" />
+    </LinearLayout>
+</LinearLayout>

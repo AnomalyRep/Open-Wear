@@ -43,16 +43,14 @@ class DashboardWidgetProvider : AppWidgetProvider() {
 
     private fun updateWidget(context: Context, manager: AppWidgetManager, widgetId: Int) {
         val info = DeviceInfoReader.read(context)
-        val views = RemoteViews(context.packageName, R.layout.widget_dashboard)
+        val compact = manager.getAppWidgetOptions(widgetId)
+            .getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) < 180
+        val views = RemoteViews(
+            context.packageName,
+            if (compact) R.layout.widget_dashboard_compact else R.layout.widget_dashboard
+        )
 
         views.setTextViewText(R.id.tvDevice, info.model.uppercase())
-        views.setTextViewText(R.id.tvCPU, context.getString(R.string.processor) + " : " + info.cpu)
-        views.setTextViewText(R.id.tvGPU, context.getString(R.string.graphic) + " : " + info.gpu)
-        views.setTextViewText(R.id.tvTotalRam, context.getString(R.string.total_ram) + " : " + info.ram)
-        views.setTextViewText(R.id.tvTotalStorage, context.getString(R.string.total_storage) + " : " + info.storage)
-        views.setTextViewText(R.id.tvActiveSlot, context.getString(R.string.active_slot) + " : " + info.activeSlot)
-        // The v4 widget sources these two values in the opposite order from the
-        // main dashboard: battery = PowerProfile, profile = charge_full.
         val powerProfileBattery =
             DeviceInfoReader.powerProfileDouble(context).toInt().toString()
         views.setTextViewText(
@@ -60,13 +58,22 @@ class DashboardWidgetProvider : AppWidgetProvider() {
             context.getString(R.string.battery_capacity) + " : " + powerProfileBattery + " mAh"
         )
         views.setTextViewText(
-            R.id.tvKernelPowerProfile,
-            context.getString(R.string.power_profile) + " : " + info.batteryCapacity
-        )
-        views.setTextViewText(
             R.id.tvWearLevel,
             id.openwear.diskhealth.data.WearLevelReader.healthText(context)
         )
+        if (!compact) {
+            views.setTextViewText(R.id.tvCPU, context.getString(R.string.processor) + " : " + info.cpu)
+            views.setTextViewText(R.id.tvGPU, context.getString(R.string.graphic) + " : " + info.gpu)
+            views.setTextViewText(R.id.tvTotalRam, context.getString(R.string.total_ram) + " : " + info.ram)
+            views.setTextViewText(R.id.tvTotalStorage, context.getString(R.string.total_storage) + " : " + info.storage)
+            views.setTextViewText(R.id.tvActiveSlot, context.getString(R.string.active_slot) + " : " + info.activeSlot)
+            // The v4 widget sources these two values in the opposite order from the
+            // main dashboard: battery = PowerProfile, profile = charge_full.
+            views.setTextViewText(
+                R.id.tvKernelPowerProfile,
+                context.getString(R.string.power_profile) + " : " + info.batteryCapacity
+            )
+        }
         views.setImageViewResource(R.id.deviceimage, Artwork.forModel(info.model))
 
         val refresh = Intent(context, DashboardWidgetProvider::class.java)

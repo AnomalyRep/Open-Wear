@@ -43,13 +43,23 @@ class WearLevelWidget : AppWidgetProvider() {
         runBlocking { WearLevelReader.scan(context) }
         val stats = WearLevelReader.stats(context)
 
-        val views = RemoteViews(context.packageName, R.layout.widget_wearlevel)
+        val compact = manager.getAppWidgetOptions(widgetId)
+            .getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) < 180
+        val views = RemoteViews(
+            context.packageName,
+            if (compact) R.layout.widget_wearlevel_compact else R.layout.widget_wearlevel
+        )
         views.setTextViewText(
             R.id.tv_disk_type,
             stats.diskType + " " + context.getString(R.string.wear_level)
         )
-        bindGroup(views, true, stats.groupA)
-        bindGroup(views, false, stats.groupB)
+        if (compact) {
+            val group = if (stats.groupA.visible) stats.groupA else stats.groupB
+            bindCompact(views, group)
+        } else {
+            bindGroup(views, true, stats.groupA)
+            bindGroup(views, false, stats.groupB)
+        }
 
         val refresh = Intent(context, WearLevelWidget::class.java).setAction(ACTION_WEAR_REFRESH)
         val pending = PendingIntent.getBroadcast(
@@ -60,6 +70,18 @@ class WearLevelWidget : AppWidgetProvider() {
         )
         views.setOnClickPendingIntent(R.id.cv_wear_level, pending)
         manager.updateAppWidget(widgetId, views)
+    }
+
+    private fun bindCompact(views: RemoteViews, group: WearGroup) {
+        views.setTextViewText(R.id.tv_wear_level_title_a, group.title.orEmpty())
+        bindNode(
+            views,
+            group.one,
+            R.id.fl_1a,
+            R.id.tv_hex_1_a,
+            R.id.tv_wear_level_percent_1a,
+            R.id.wear_level_progress_1a
+        )
     }
 
     private fun bindGroup(views: RemoteViews, isA: Boolean, group: WearGroup) {

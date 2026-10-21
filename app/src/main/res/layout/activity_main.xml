@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@id/coordinator" android:background="?colorSurfaceVariant" android:fitsSystemWindows="false" android:layout_width="match_parent" android:layout_height="match_parent"
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@id/coordinator" android:background="@android:color/transparent" android:fitsSystemWindows="false" android:layout_width="match_parent" android:layout_height="match_parent"
   xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
     <include android:id="@id/toolbarlayout" layout="@layout/toolbar" />
     <androidx.core.widget.NestedScrollView android:id="@id/nested_scroll_view" android:paddingBottom="24.0dp" android:fadingEdgeLength="96.0dp" android:layout_width="match_parent" android:layout_height="match_parent" android:requiresFadingEdge="vertical" app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">

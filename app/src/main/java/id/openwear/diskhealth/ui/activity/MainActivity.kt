@@ -17,14 +17,16 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import id.openwear.diskhealth.R
 import id.openwear.diskhealth.data.BackupManager
+import id.openwear.diskhealth.data.BatteryInfo
+import id.openwear.diskhealth.data.BatteryInfoReader
 import id.openwear.diskhealth.data.Benchmark
 import id.openwear.diskhealth.data.BenchmarkResult
 import id.openwear.diskhealth.data.DeviceInfoReader
 import id.openwear.diskhealth.data.DiskUsageReader
 import id.openwear.diskhealth.data.HistoryPoint
 import id.openwear.diskhealth.data.HistoryStore
+import id.openwear.diskhealth.data.WearItem
 import id.openwear.diskhealth.data.WearLevelReader
-import id.openwear.diskhealth.data.WearNode
 import id.openwear.diskhealth.ui.Artwork
 import id.openwear.diskhealth.ui.DialogFactory
 import id.openwear.diskhealth.ui.Ui
@@ -63,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private var benchmarkRunning = false
     private var historyA: List<HistoryPoint> = emptyList()
     private var historyB: List<HistoryPoint> = emptyList()
+    private var lastBattery = BatteryInfo()
 
     private fun prefs() =
         getSharedPreferences(packageName + "_preferences", MODE_PRIVATE)
@@ -72,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         Ui.applyTheme(this)
         setContentView(R.layout.activity_main)
         Ui.edgeToEdge(this)
+        Ui.applyAppearance(this)
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -98,13 +102,20 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, BackupRestoreActivity::class.java))
         }
         findViewById<View>(R.id.btn_reports).setOnClickListener { showReports() }
+        findViewById<View>(R.id.tvBatteryHealth).setOnClickListener { showBatteryHealth() }
 
         bindBenchmarkFromPrefs()
     }
 
     override fun onResume() {
         super.onResume()
+        Ui.applyAppearance(this)
         refresh()
+    }
+
+    override fun onDestroy() {
+        Ui.stopAppearance(this)
+        super.onDestroy()
     }
 
     private fun refresh() {
@@ -116,10 +127,11 @@ class MainActivity : AppCompatActivity() {
             val a = withContext(Dispatchers.IO) { HistoryStore.load(this@MainActivity, "wear_history_a") }
             val b = withContext(Dispatchers.IO) { HistoryStore.load(this@MainActivity, "wear_history_b") }
             val backups = withContext(Dispatchers.IO) { BackupManager.listBackups().map { it.name } }
-            val health = withContext(Dispatchers.IO) { WearLevelReader.healthText(this@MainActivity) }
+            val battery = withContext(Dispatchers.IO) { BatteryInfoReader.read(this@MainActivity) }
 
             historyA = a
             historyB = b
+            lastBattery = battery
 
             findViewById<TextView>(R.id.tvDevice).text = info.model.uppercase(Locale.ROOT)
             findViewById<TextView>(R.id.tvCPU).text = getString(R.string.processor) + " : " + info.cpu
@@ -128,10 +140,17 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.tvTotalStorage).text = getString(R.string.total_storage) + " : " + info.storage
             findViewById<TextView>(R.id.tvActiveSlot).text = getString(R.string.active_slot) + " : " + info.activeSlot
             findViewById<TextView>(R.id.tvBatteryCapacity).text =
-                getString(R.string.battery_capacity) + " : " + info.batteryCapacity + " mAh"
+                getString(R.string.battery_design_capacity) + " : " +
+                    (battery.designCapacityMah.takeIf { it > 0 }?.let { "$it mAh" }
+                        ?: getString(R.string.not_available))
+            findViewById<TextView>(R.id.tvBatteryHealth).text =
+                getString(R.string.battery_health) + " : " +
+                    (if (battery.healthValid) "${battery.healthPercent}%" else getString(R.string.not_available))
+            findViewById<TextView>(R.id.tvBatteryCycles).text =
+                getString(R.string.battery_cycle_count) + " : " + battery.cycleCount
             findViewById<TextView>(R.id.tvKernelPowerProfile).text =
                 getString(R.string.power_profile) + " : " + info.powerProfile + " mAh"
-            findViewById<TextView>(R.id.tvWearLevel).text = health
+            findViewById<TextView>(R.id.tvWearLevel).text = WearLevelReader.healthText(this@MainActivity)
             bindArtwork(info.model)
 
             pie.percent = part.percent.toFloat()
@@ -140,9 +159,8 @@ class MainActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.tv_free_size).text = part.freeText
 
             findViewById<TextView>(R.id.tv_disk_type).text =
-                wear.diskType + " " + getString(R.string.wear_level)
-            bindWearGroup(true, wear.groupA.title, wear.groupA.nodePath, wear.groupA.visible, wear.groupA.one, wear.groupA.two)
-            bindWearGroup(false, wear.groupB.title, wear.groupB.nodePath, wear.groupB.visible, wear.groupB.one, wear.groupB.two)
+                wear.diskType + " " + getString(R.string.wear_level_plain)
+            bindWearItems(wear.items)
 
             chart.setData(historyA, historyB)
             bindBackups(backups)
@@ -155,44 +173,90 @@ class MainActivity : AppCompatActivity() {
             .setImageResource(Artwork.forModel(model))
     }
 
-    private fun bindWearGroup(
-        isA: Boolean,
-        title: String?,
-        nodePath: String?,
-        visible: Boolean,
-        one: WearNode?,
-        two: WearNode?
-    ) {
-        val groupId = if (isA) R.id.wear_a else R.id.wear_b
-        val group = findViewById<View>(groupId)
-        group.visibility = if (visible) View.VISIBLE else View.GONE
-        if (!visible) return
-
-        val titleId = if (isA) R.id.tv_wear_level_title_a else R.id.tv_wear_level_title_b
-        val nodeId = if (isA) R.id.tv_node_a else R.id.tv_node_b
-        findViewById<TextView>(titleId).text = title.orEmpty()
-        findViewById<TextView>(nodeId).text = nodePath.orEmpty()
-
-        if (isA) {
-            bindNode(one, R.id.fl_1a, R.id.tv_hex_1_a, R.id.tv_wear_level_percent_1a, R.id.wear_level_progress_1a)
-            bindNode(two, R.id.fl_2a, R.id.tv_hex_2_a, R.id.tv_wear_level_percent_2a, R.id.wear_level_progress_2a)
-        } else {
-            bindNode(one, R.id.fl_1b, R.id.tv_hex_1_b, R.id.tv_wear_level_percent_1b, R.id.wear_level_progress_1b)
-            bindNode(two, R.id.fl_2b, R.id.tv_hex_2_b, R.id.tv_wear_level_percent_2b, R.id.wear_level_progress_2b)
+    private fun bindWearItems(items: List<WearItem>) {
+        val container = findViewById<android.widget.LinearLayout>(R.id.wear_items)
+        container.removeAllViews()
+        if (items.isEmpty()) {
+            val view = LayoutInflater.from(this).inflate(R.layout.item_wear_node, container, false)
+            view.findViewById<TextView>(R.id.item_title).text = getString(R.string.storage_health)
+            view.findViewById<TextView>(R.id.item_hex).text = getString(R.string.not_available)
+            view.findViewById<TextView>(R.id.item_percent).text = "--"
+            view.findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(
+                R.id.item_progress
+            ).setProgressCompat(0, false)
+            container.addView(view)
+            return
+        }
+        for (item in items) {
+            val view = LayoutInflater.from(this).inflate(R.layout.item_wear_node, container, false)
+            view.findViewById<TextView>(R.id.item_title).text = item.title
+            view.findViewById<TextView>(R.id.item_hex).text = item.node.hex
+            view.findViewById<TextView>(R.id.item_percent).text = item.node.percentText
+            view.findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(
+                R.id.item_progress
+            ).setProgressCompat(item.node.percent, true)
+            view.setOnClickListener {
+                if (item.preEol) showPreEolInfo() else showWearInfo(item)
+            }
+            container.addView(view)
         }
     }
 
-    private fun bindNode(node: WearNode?, frameId: Int, hexId: Int, percentId: Int, progressId: Int) {
-        val frame = findViewById<View>(frameId)
-        if (node == null || !node.visible) {
-            frame.visibility = View.GONE
-            return
+    private fun showWearInfo(item: WearItem) {
+        val isPslc = item.title.contains("pSLC", ignoreCase = true)
+        val title = if (isPslc) {
+            getString(R.string.explain_pslc_title)
+        } else {
+            getString(R.string.explain_tlc_mlc_title)
         }
-        frame.visibility = View.VISIBLE
-        findViewById<TextView>(hexId).text = node.hex
-        findViewById<TextView>(percentId).text = node.percentText
-        findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(progressId)
-            .setProgressCompat(node.percent, true)
+        val body = if (isPslc) {
+            getString(R.string.explain_pslc_desc)
+        } else {
+            getString(R.string.explain_tlc_mlc_desc)
+        }
+        Ui.dialog(
+            this,
+            title,
+            "$body\n\n${item.node.hex}  ${item.node.percentText}",
+            positive = getString(R.string.close),
+            root = findViewById(android.R.id.content)
+        )
+    }
+
+    private fun showPreEolInfo() {
+        Ui.dialog(
+            this,
+            getString(R.string.explain_preeol_title),
+            getString(R.string.explain_preeol_desc),
+            positive = getString(R.string.close),
+            root = findViewById(android.R.id.content)
+        )
+    }
+
+    private fun showBatteryHealth() {
+        val info = lastBattery
+        val body = buildString {
+            appendLine("${getString(R.string.battery_health)}: " +
+                if (info.healthValid) "${info.healthPercent}%" else getString(R.string.not_available))
+            appendLine("${getString(R.string.battery_design_capacity)}: " +
+                if (info.designCapacityMah > 0) "${info.designCapacityMah} mAh" else getString(R.string.not_available))
+            appendLine("${getString(R.string.battery_estimated_capacity)}: " +
+                if (info.estimatedCapacityMah > 0) "${info.estimatedCapacityMah} mAh" else getString(R.string.not_available))
+            appendLine("${getString(R.string.battery_cycle_count)}: ${info.cycleCount}")
+            appendLine("${getString(R.string.battery_status)}: ${info.statusText}")
+            appendLine("${getString(R.string.battery_voltage)}: ${info.voltage}")
+            appendLine("${getString(R.string.battery_charger_status)}: ${info.chargerStatus}")
+            appendLine("${getString(R.string.battery_power)}: ${info.power}")
+            appendLine()
+            append(getString(R.string.battery_health_calc_desc))
+        }
+        Ui.dialog(
+            this,
+            getString(R.string.battery_health),
+            body,
+            positive = getString(R.string.close),
+            root = findViewById(android.R.id.content)
+        )
     }
 
     private fun bindBackups(backups: List<String>) {

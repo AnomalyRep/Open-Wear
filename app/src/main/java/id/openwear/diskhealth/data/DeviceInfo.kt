@@ -40,13 +40,13 @@ object DeviceInfoReader {
             ?.uppercase(Locale.ROOT) ?: "Unknown Model"
         prefs.edit().putString("device_model", model).apply()
 
-        val cpu = command("getprop ro.soc.model")
-            .ifBlank { command("getprop ro.board.platform") }
-            .ifBlank { command("grep 'Hardware' /proc/cpuinfo | cut -d: -f2") }
+        val cpu = command(context, "getprop ro.soc.model")
+            .ifBlank { command(context, "getprop ro.board.platform") }
+            .ifBlank { command(context, "grep 'Hardware' /proc/cpuinfo | cut -d: -f2") }
             .ifBlank { "Unknown" }
-        val gpu = command("cat /sys/class/kgsl/kgsl-3d0/gpu_model").ifBlank { "Unknown" }
+        val gpu = command(context, "cat /sys/class/kgsl/kgsl-3d0/gpu_model").ifBlank { "Unknown" }
         val activeSlot = activeSlot(context)
-        val battery = command("cat /sys/class/power_supply/battery/charge_full | cut -c1-4")
+        val battery = command(context, "cat /sys/class/power_supply/battery/charge_full | cut -c1-4")
             .ifBlank { "-" }
 
         return Info(
@@ -65,11 +65,17 @@ object DeviceInfoReader {
     private fun prefs(context: Context) =
         context.getSharedPreferences(context.packageName + "_preferences", Context.MODE_PRIVATE)
 
-    private fun command(cmd: String): String =
-        Shell.run(cmd, 14).stdout.lineSequence()
+    private fun command(context: Context, cmd: String): String {
+        val result = if (AccessMode.current(context) == AccessMode.ROOT) {
+            Shell.run(cmd, 14)
+        } else {
+            Shell.runUser(cmd, 14)
+        }
+        return result.stdout.lineSequence()
             .map { it.trim() }
             .firstOrNull { it.isNotEmpty() }
             .orEmpty()
+    }
 
     private fun totalRam(context: Context): Long {
         val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
@@ -93,7 +99,7 @@ object DeviceInfoReader {
     private fun activeSlot(context: Context): String {
         val prefs = prefs(context)
         if (!prefs.contains("key_active_slot")) {
-            val suffix = command("getprop ro.boot.slot_suffix").trim().lowercase(Locale.ROOT)
+            val suffix = command(context, "getprop ro.boot.slot_suffix").trim().lowercase(Locale.ROOT)
             val label = when {
                 suffix.startsWith("a") -> "Slot A"
                 suffix.startsWith("b") -> "Slot B"

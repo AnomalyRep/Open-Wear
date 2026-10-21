@@ -35,15 +35,23 @@ data class WearGroup(
     val two: WearNode? = null
 )
 
+data class WearItem(
+    val title: String = "",
+    val nodePath: String? = null,
+    val node: WearNode = WearNode(),
+    val visible: Boolean = true,
+    val preEol: Boolean = false
+)
+
 data class WearStats(
     val diskType: String = "Unknown",
     val groupA: WearGroup = WearGroup(),
-    val groupB: WearGroup = WearGroup()
+    val groupB: WearGroup = WearGroup(),
+    val preEol: WearNode? = null,
+    val items: List<WearItem> = emptyList()
 )
 
 object WearLevelReader {
-
-    private const val PREFS = "wear_prefs"
 
     private val CODES = linkedMapOf(
         "0x01" to 100, "0x02" to 90, "0x03" to 80, "0x04" to 70,
@@ -59,7 +67,8 @@ object WearLevelReader {
         val path: String,
         val typeRes: Int,
         val values: List<String>,
-        val nodes: List<String>
+        val nodes: List<String>,
+        val preEol: String? = null
     )
 
     fun prefs(context: Context) =
@@ -88,12 +97,37 @@ object WearLevelReader {
         return WearNode(percent = percentOf(hex), hex = hex, percentText = percentText(hex), visible = true)
     }
 
-    /** Performs the root scan and stores results in preferences. */
+    /**
+     * JEDEC PRE_EOL_INFO values use their own labels instead of the life-time
+     * percentage table. 0x01 is healthy, 0x02 warning, 0x03 urgent.
+     */
+    fun preEolNode(raw: String?): WearNode {
+        if (raw.isNullOrBlank()) return WearNode()
+        val hex = normalizeHex(raw)
+        val percent = when (hex) {
+            "0x01" -> 100
+            "0x02" -> 80
+            "0x03" -> 50
+            "0x0b" -> 1
+            else -> 0
+        }
+        val text = when (hex) {
+            "0x01" -> "Normal"
+            "0x02" -> "Warning"
+            "0x03" -> "Urgent"
+            "0x0b" -> "EOL"
+            else -> hex
+        }
+        return WearNode(percent = percent, hex = hex, percentText = text, visible = true)
+    }
+
+    /** Performs the scan and stores results in preferences. */
     suspend fun scan(context: Context) {
-        val source = scanEmmc()
-            ?: scanUfsHealth()
-            ?: scanVendorLifetime()
-            ?: scanProcUfs()
+        val mode = AccessMode.current(context)
+        val source = scanEmmc(mode)
+            ?: scanUfsHealth(mode)
+            ?: scanVendorLifetime(mode)
+            ?: scanProcUfs(mode)
             ?: return
 
         val values = source.values
@@ -104,7 +138,8 @@ object WearLevelReader {
         // Drop stale results so a 4-code eMMC does not leak into a 2-code UFS.
         listOf(
             "disk_hex_1a", "disk_hex_1b", "disk_hex_2a", "disk_hex_2b",
-            "disk_single_hex", "disk_node_a", "disk_node_b", "disk_single_node"
+            "disk_single_hex", "disk_node_a", "disk_node_b", "disk_single_node",
+            "disk_pre_eol"
         ).forEach { editor.remove(it) }
 
         editor.putString("disk_health_type", context.getString(source.typeRes))
@@ -123,6 +158,7 @@ object WearLevelReader {
             editor.putString("disk_single_hex", values[0])
             editor.putString("disk_single_node", source.path)
         }
+        source.preEol?.let { editor.putString("disk_pre_eol", normalizeHex(it)) }
         editor.apply()
 
         // History is recorded after the scan, exactly like the original.
@@ -130,17 +166,24 @@ object WearLevelReader {
         HistoryStore.record(context, "wear_history_b", values.getOrNull(1))
     }
 
-    private fun firstLine(vararg commands: String): String {
+    private fun exec(mode: AccessMode, command: String, timeoutSeconds: Long = 20): String =
+        if (mode == AccessMode.ROOT) {
+            Shell.run(command, timeoutSeconds).stdout
+        } else {
+            Shell.runUser(command, timeoutSeconds).stdout
+        }
+
+    private fun firstLine(mode: AccessMode, vararg commands: String): String {
         for (command in commands) {
-            val line = Shell.run(command, 20).stdout
+            val line = exec(mode, command, 20)
                 .lineSequence().firstOrNull().orEmpty().trim()
             if (line.isNotEmpty()) return line
         }
         return ""
     }
 
-    private fun readCodes(path: String): List<String> =
-        Shell.run("cat $path", 20).stdout
+    private fun readCodes(mode: AccessMode, path: String): List<String> =
+        exec(mode, "cat $path", 20)
             .replace('\n', ' ')
             .trim()
             .split(Regex("\\s+"))
@@ -148,8 +191,9 @@ object WearLevelReader {
             .map(::normalizeHex)
 
     /** eMMC: sysfs first; `/dev/block/mmcblk0/device` is a broken v4 fallback. */
-    private fun scanEmmc(): ScanResult? {
+    private fun scanEmmc(mode: AccessMode): ScanResult? {
         val path = firstLine(
+            mode,
             // `device` is a symlink; a direct glob still resolves it.
             "ls -1d /sys/block/mmcblk0/device/life_time* 2>/dev/null | head -n 1",
             "find /sys/block/mmcblk0/device/ -type f -name 'life_time*' 2>/dev/null | " +
@@ -159,17 +203,30 @@ object WearLevelReader {
                 "sed -e ':a;N;\$!ba;s/\\n/ /g'"
         )
         if (path.isEmpty()) return null
-        val values = readCodes(path)
+        val values = readCodes(mode, path)
         if (values.isEmpty()) return null
-        return ScanResult(path, R.string.emmc, values, path.split(Regex("\\s+")))
+        val preEol = firstLine(
+            mode,
+            "cat /sys/block/mmcblk0/device/pre_eol_info 2>/dev/null",
+            "cat /sys/block/mmcblk0/device/pre_eol 2>/dev/null",
+            "cat /dev/block/mmcblk0/device/pre_eol_info 2>/dev/null"
+        ).takeIf { it.isNotEmpty() }
+        return ScanResult(
+            path,
+            R.string.emmc,
+            values,
+            path.split(Regex("\\s+")),
+            preEol
+        )
     }
 
     /**
      * UFS: modern kernels expose `DeviceLifeTimeEstA/B` in a `health` file,
      * usually below `/sys/devices/platform/soc`, in a `*.ufshc` directory.
      */
-    private fun scanUfsHealth(): ScanResult? {
+    private fun scanUfsHealth(mode: AccessMode): ScanResult? {
         val path = firstLine(
+            mode,
             "ls -1d /sys/devices/platform/soc/*ufshc*/health " +
                 "/sys/devices/platform/soc/*ufs*/health " +
                 "/sys/devices/platform/*ufshc*/health " +
@@ -179,35 +236,53 @@ object WearLevelReader {
             "find /sys/devices/ -type f -path '*ufs*' -name 'health' 2>/dev/null | head -n 1"
         )
         if (path.isEmpty()) return null
-        val text = Shell.run("cat $path", 20).stdout
-        val values = parseUfsHealth(text)
-        if (values.isEmpty() || values.all { it == "0x00" }) return null
-        return ScanResult(path, R.string.ufs, values, listOf(path))
+        val text = exec(mode, "cat $path", 20)
+        val parsed = parseUfsHealth(text)
+        if (parsed.values.isEmpty() || parsed.values.all { it == "0x00" }) return null
+        return ScanResult(path, R.string.ufs, parsed.values, listOf(path), parsed.preEol)
     }
 
-    private fun parseUfsHealth(text: String): List<String> {
+    private data class ParsedHealth(val values: List<String>, val preEol: String?)
+
+    private fun parseUfsHealth(text: String): ParsedHealth {
         val found = linkedMapOf<String, String>()
         Regex(UFS_ESTIMATE, RegexOption.IGNORE_CASE).findAll(text).forEach { match ->
             found[match.groupValues[1].uppercase(Locale.US)] = match.groupValues[2]
         }
         val a = found["A"]
         val b = found["B"]
-        if (a != null) return listOfNotNull(a, b)
-        if (b != null) return listOf(b)
+        val preEol = parsePreEol(text)
+        if (a != null) return ParsedHealth(listOfNotNull(a, b).map(::normalizeHex), preEol)
+        if (b != null) return ParsedHealth(listOf(b).map(::normalizeHex), preEol)
         // Some vendor modules print only two raw codes.
-        val codes = Regex("0[xX][0-9a-fA-F]+").findAll(text).map { it.value }.toList()
-        return if (codes.size == 2) codes else emptyList()
+        val codes = Regex("0[xX][0-9a-fA-F]+").findAll(text)
+            .map { normalizeHex(it.value) }
+            .toList()
+        return ParsedHealth(if (codes.size == 2) codes else emptyList(), preEol)
+    }
+
+    private fun parsePreEol(text: String): String? {
+        val patterns = listOf(
+            "(?:Pre[ -]?EOL(?:Info)?|PRE_EOL_INFO|pre_eol_info)\\s*[:=]\\s*(0[xX][0-9a-fA-F]+|[0-9a-fA-F]+)",
+            "\\bpre_eol_info\\b\\s+(0[xX][0-9a-fA-F]+|[0-9a-fA-F]+)"
+        )
+        for (pattern in patterns) {
+            val match = Regex(pattern, RegexOption.IGNORE_CASE).find(text) ?: continue
+            return match.groupValues[1]
+        }
+        return null
     }
 
     /** Older/vendor UFS and eMMC nodes: `life_time*` then `lifetime*`. */
-    private fun scanVendorLifetime(): ScanResult? {
+    private fun scanVendorLifetime(mode: AccessMode): ScanResult? {
         for (name in listOf("life_time*", "lifetime*")) {
             val paths = firstLine(
+                mode,
                 "find /sys/devices/ -type f -name '$name' 2>/dev/null | " +
                     "sed -e ':a;N;\$!ba;s/\\n/ /g'"
             )
             if (paths.isEmpty()) continue
-            val values = readCodes(paths)
+            val values = readCodes(mode, paths)
             if (values.isEmpty()) continue
             val type = if (paths.contains("mmcblk")) R.string.emmc else R.string.ufs
             return ScanResult(
@@ -221,12 +296,18 @@ object WearLevelReader {
     }
 
     /** Vendor kernel modules sometimes expose `/proc/ufs_health`. */
-    private fun scanProcUfs(): ScanResult? {
-        val text = Shell.run("cat /proc/ufs_health 2>/dev/null", 10).stdout
+    private fun scanProcUfs(mode: AccessMode): ScanResult? {
+        val text = exec(mode, "cat /proc/ufs_health 2>/dev/null", 10)
         if (text.isBlank()) return null
-        val values = parseUfsHealth(text)
-        if (values.isEmpty() || values.all { it == "0x00" }) return null
-        return ScanResult("/proc/ufs_health", R.string.ufs, values, listOf("/proc/ufs_health"))
+        val parsed = parseUfsHealth(text)
+        if (parsed.values.isEmpty() || parsed.values.all { it == "0x00" }) return null
+        return ScanResult(
+            "/proc/ufs_health",
+            R.string.ufs,
+            parsed.values,
+            listOf("/proc/ufs_health"),
+            parsed.preEol
+        )
     }
 
     /** Rebuilds the UI model from shared preferences (`p045r1.g.b`). */
@@ -241,8 +322,8 @@ object WearLevelReader {
         val single = p.getString("disk_single_hex", null)
         val hex1b = p.getString("disk_hex_1b", null)
         val hex2b = p.getString("disk_hex_2b", null)
-
-        val sameNode = hex1a != null && hex1b != null && hex1a == hex1b
+        val preEolRaw = p.getString("disk_pre_eol", null)
+        val preEol = if (preEolRaw.isNullOrBlank()) null else preEolNode(preEolRaw)
 
         val groupA: WearGroup
         val groupB: WearGroup
@@ -250,9 +331,9 @@ object WearLevelReader {
         if (single == null) {
             groupA = if (hex1a != null) {
                 WearGroup(
-                    title = context.getString(R.string.wear_level),
+                    title = context.getString(R.string.wear_level_a),
                     nodePath = nodeA,
-                    visible = !sameNode,
+                    visible = true,
                     one = node(hex1a),
                     two = if (hex2a != null) node(hex2a) else WearNode()
                 )
@@ -261,7 +342,7 @@ object WearLevelReader {
             }
             groupB = if (hex1b != null) {
                 WearGroup(
-                    title = context.getString(R.string.cycle_usages),
+                    title = context.getString(R.string.wear_level_b),
                     nodePath = nodeB,
                     visible = true,
                     one = node(hex1b),
@@ -273,7 +354,7 @@ object WearLevelReader {
         } else {
             val singleNode = p.getString("disk_single_node", "").orEmpty()
             groupA = WearGroup(
-                title = context.getString(R.string.wear_level),
+                title = context.getString(R.string.wear_level_a),
                 nodePath = singleNode,
                 visible = true,
                 one = node(single),
@@ -281,7 +362,7 @@ object WearLevelReader {
             )
             groupB = if (hex1b != null) {
                 WearGroup(
-                    title = context.getString(R.string.cycle_usages),
+                    title = context.getString(R.string.wear_level_b),
                     nodePath = nodeB,
                     visible = true,
                     one = node(hex1b),
@@ -292,14 +373,66 @@ object WearLevelReader {
             }
         }
 
-        return WearStats(type, groupA, groupB)
+        val items = mutableListOf<WearItem>()
+        if (single != null) {
+            val singleNode = p.getString("disk_single_node", "").orEmpty()
+            items += WearItem(
+                title = context.getString(R.string.wear_level_a),
+                nodePath = singleNode,
+                node = node(single)
+            )
+        } else {
+            if (hex1a != null) {
+                items += WearItem(
+                    title = context.getString(R.string.wear_level_a),
+                    nodePath = nodeA,
+                    node = node(hex1a)
+                )
+            }
+            if (hex2a != null) {
+                items += WearItem(
+                    title = context.getString(R.string.wear_level_a),
+                    nodePath = nodeA,
+                    node = node(hex2a)
+                )
+            }
+            if (hex1b != null) {
+                items += WearItem(
+                    title = context.getString(R.string.wear_level_b),
+                    nodePath = nodeB,
+                    node = node(hex1b)
+                )
+            }
+            if (hex2b != null) {
+                items += WearItem(
+                    title = context.getString(R.string.wear_level_b),
+                    nodePath = nodeB,
+                    node = node(hex2b)
+                )
+            }
+        }
+        if (preEol != null) {
+            items += WearItem(
+                title = context.getString(R.string.wear_level_c),
+                nodePath = null,
+                node = preEol,
+                preEol = true
+            )
+        }
+        // Drop duplicate/hidden entries but keep the pre-EOL row.
+        val visibleItems = items.filter { it.visible && it.node.visible }
+
+        return WearStats(type, groupA, groupB, preEol, visibleItems)
     }
 
     /** `p045r1.g.c`: "Storage Health N %". */
     fun healthText(context: Context): String {
         val p = prefs(context)
         val hex = p.getString("disk_hex_1a", null) ?: p.getString("disk_single_hex", null)
-        val value = if (hex == null) 0 else percentOf(hex)
-        return context.getString(R.string.storage_health) + " $value %"
+        if (hex == null) {
+            return context.getString(R.string.storage_health) + " " +
+                context.getString(R.string.not_available)
+        }
+        return context.getString(R.string.storage_health) + " ${percentOf(hex)} %"
     }
 }

@@ -144,7 +144,6 @@ class HistoryChartView @JvmOverloads constructor(
 
         val path = Path()
         val fill = Path()
-        var firstX = 0f
         var lastX = 0f
         points.forEachIndexed { index, point ->
             val x = left + ((point.t - min).toFloat() / span) * (right - left)
@@ -153,7 +152,6 @@ class HistoryChartView @JvmOverloads constructor(
                 path.moveTo(x, y)
                 fill.moveTo(x, bottom)
                 fill.lineTo(x, y)
-                firstX = x
             } else {
                 path.lineTo(x, y)
                 fill.lineTo(x, y)
