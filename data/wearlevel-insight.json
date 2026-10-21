@@ -167,7 +167,7 @@
       "night_surface": "#1e1e1e",
       "note": "v4 hard-coded text color #b6202020 replaced with theme-aware colors; cards keep the v4 palette."
     },
-    "edge_to_edge": "transparent status bar + root top padding from system-bar insets, mirroring v4 p042q0.a.e",
+    "edge_to_edge": "transparent status and navigation bars, root system-bar padding, day/night icon appearance, and contrast enforcement disabled on Android 10+, mirroring androidx.activity EdgeToEdge used by v5",
     "v5_note": "v5.0.0 keeps the Kotlin/XML base. Access Mode, battery health, Wear A/B/Pre-EOL, appearance/background choices, compact widgets, update check, and the v5 disclaimer were backported from static analysis of the Compose rewrite."
   },
   "runtime": {
@@ -382,7 +382,7 @@
     "repacked_apk_shipped": false,
     "resource_layer": "decoded from the v4.0.1 and v5.0.0 APKs for static analysis",
     "logic_layer": "new Kotlin implementation",
-    "artwork": "bundled copies of the original device webp assets, used offline",
+    "artwork": "bundled copies of the original device webp assets, used offline; the two v5 flat wallpapers are included only in the owner's local parity build, are gitignored, and must not be redistributed",
     "static_only": true,
     "authorization": "owner-supplied APK, personal/authorized reverse engineering",
     "v5_original_shipped": false,
@@ -392,8 +392,8 @@
     "assembleDebug": "BUILD SUCCESSFUL",
     "assembleRelease": "BUILD SUCCESSFUL",
     "apk": "OpenWear-5.0.0-release.apk (local dist folder, not published)",
-    "apk_sha256": "62568BC13122A6A31D57FF03977C1CD5BF732A28ADD6787A9BC7F0C68566DE2D",
-    "apk_size_bytes": 14338603,
+    "apk_sha256": "FC9DEA08A349856CBE9C684E66C7810C3F660A8820DAA8BD1C1AAC158E2E611C",
+    "apk_size_bytes": 14367389,
     "apk_signature": {
       "scheme": "v3",
       "signer_cn": "OpenWear",
@@ -424,6 +424,7 @@
     "The Settings dependency dialog intentionally lists original 4.0.1 libraries for fidelity, not the rebuild's dependencies.",
     "LogWire diagnostics and assets/main.jar privileged payload are omitted.",
     "The v5 upstream is a Compose rewrite; this port keeps the XML shell and only approximates Compose appearance and animation.",
+    "The two v5 reference wallpapers are local-only assets. They are ignored by git and must not be redistributed; builds without them fall back to procedural orbs.",
     "AGP 8.5.2 is older than compileSdk 36, so android.suppressUnsupportedCompileSdk=36 is required and AGP emits a warning."
   ],
   "links": {

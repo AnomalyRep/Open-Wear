@@ -4,6 +4,8 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.RenderEffect
 import android.graphics.Shader
@@ -44,8 +46,13 @@ object Ui {
         val night = (activity.resources.configuration.uiMode and
             android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
             android.content.res.Configuration.UI_MODE_NIGHT_YES
-        androidx.core.view.WindowInsetsControllerCompat(activity.window, root)
-            .isAppearanceLightStatusBars = !night
+        val controller = androidx.core.view.WindowInsetsControllerCompat(activity.window, root)
+        controller.isAppearanceLightStatusBars = !night
+        controller.isAppearanceLightNavigationBars = !night
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            activity.window.isStatusBarContrastEnforced = false
+            activity.window.isNavigationBarContrastEnforced = false
+        }
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(0, bars.top, 0, bars.bottom)
@@ -77,6 +84,7 @@ object Ui {
 
     private val cardStyles = WeakHashMap<MaterialCardView, CardStyle>()
     private val appBarTints = WeakHashMap<View, ColorStateList?>()
+    private val wallpaperCache = HashMap<Int, Bitmap>()
 
     /** Applies the v5 appearance/background choice to an activity root. */
     fun applyAppearance(activity: Activity) {
@@ -97,7 +105,8 @@ object Ui {
                 root.background = AnimatedOrbsDrawable(isDark, true).also { it.start() }
             }
             liquid -> {
-                root.background = AnimatedOrbsDrawable(isDark, false)
+                root.background = referenceWallpaper(activity, isDark)
+                    ?: AnimatedOrbsDrawable(isDark, false)
             }
             else -> {
                 root.setBackgroundColor(surfaceVariantColor(activity))
@@ -353,6 +362,22 @@ object Ui {
         } else {
             null
         }
+    }
+
+    private fun referenceWallpaper(context: Context, dark: Boolean): Drawable? {
+        val name = if (dark) "bg_flat_dark" else "bg_flat_light"
+        val id = context.resources.getIdentifier(name, "drawable", context.packageName)
+        if (id == 0) return null
+        val bitmap = wallpaperCache[id] ?: try {
+            BitmapFactory.decodeResource(
+                context.resources,
+                id,
+                BitmapFactory.Options().apply { inScaled = false }
+            )?.also { wallpaperCache[id] = it }
+        } catch (_: Throwable) {
+            null
+        } ?: return null
+        return CenterCropDrawable(bitmap)
     }
 
     private fun surfaceVariantColor(context: Context): Int {

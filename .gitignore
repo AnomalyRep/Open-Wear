@@ -14,3 +14,8 @@ captures/
 *.aab
 dist/
 release-keystore/
+
+# Reference-only wallpaper assets for the owner's local parity build.
+# They are loaded at runtime when present and must not be redistributed.
+app/src/main/res/drawable-nodpi/bg_flat_dark.webp
+app/src/main/res/drawable-nodpi/bg_flat_light.webp

@@ -29,8 +29,9 @@ v5.0.0 adds:
 * **Wear Level A / B / Pre-EOL** - pSLC and TLC/MLC wear plus JEDEC
   `PRE_EOL_INFO` and spare-block status.
 * **Appearance** - MD3 Expressive or Liquid Glass, with Flat Color or Animated
-  Orbs backgrounds. Liquid Glass uses the v5 aurora mesh, translucent cards,
-  1dp rims, and 32dp dialogs.
+  Orbs backgrounds. Liquid Glass uses the v5 reference wallpaper for Flat Color,
+  the aurora mesh for Animated Orbs, translucent cards, 1dp rims, and 32dp
+  dialogs.
 * **Compact widgets** - dashboard and wear widgets switch to compact layouts
   when the launcher gives them a small width.
 * **Update check** - checks the latest OpenWear GitHub release.
@@ -86,11 +87,15 @@ Built and signed locally. This file has not been uploaded to GitHub.
 | File | `dist/OpenWear-5.0.0-release.apk` |
 | Package | `id.openwear.diskhealth` |
 | Version | 5.0.0 (versionCode 5) |
-| Size | 14,338,603 bytes |
-| SHA-256 | `62568BC13122A6A31D57FF03977C1CD5BF732A28ADD6787A9BC7F0C68566DE2D` |
+| Size | 14,367,389 bytes |
+| SHA-256 | `FC9DEA08A349856CBE9C684E66C7810C3F660A8820DAA8BD1C1AAC158E2E611C` |
 | Signature | APK Signature Scheme v3 |
 | Certificate SHA-256 | `8fd9d94f32760fc5df0891b8b59a9dfa2e2a708c7de081e0cf1a44dd9b8b2dcc` |
 | Certificate DN | `CN=OpenWear, OU=OpenWear, O=OpenWear, L=Unknown, ST=Unknown, C=ID` |
+
+This local artifact includes the two v5 reference wallpapers for the owner's
+parity build. They are gitignored and must not be redistributed. When the files
+are absent, the app falls back to the procedural ambient background.
 
 The v4.0.1 release remains at
 <https://github.com/AnomalyRep/Open-Wear/releases/tag/v4.0.1> and is unchanged:
